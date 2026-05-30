@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>Dicto — Recorder</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600&family=Noto+Sans+Mono:wght@400;500&family=Noto+Serif:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg:     #ffffff;
+      --text:   #000000;
+      --muted:  #555555;
+      --faint:  #999999;
+      --border: #e0e0e0;
+      --red:    #c0392b;
+      --sans:   'Noto Sans', system-ui, sans-serif;
+      --serif:  'Noto Serif', Georgia, serif;
+      --mono:   'Noto Sans Mono', monospace;
+    }
+    html, body {
+      height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── NAV ── */
+    nav {
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+      height: 52px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .logo {
+      font-family: var(--sans);
+      font-weight: 700;
+      font-size: 14px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    .nav-right {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--faint);
+      letter-spacing: 0.06em;
+    }
+
+    /* ── MAIN ── */
+    main {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: calc(100vh - 52px);
+      padding: 48px 24px 64px;
+    }
+
+    /* ── RECORDER CARD ── */
+    .recorder-card {
+      width: 100%;
+      max-width: 480px;
+      border: 1px solid var(--border);
+      padding: 40px 36px 36px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0;
+    }
+
+    /* Status label */
+    .status-label {
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--faint);
+      margin-bottom: 32px;
+      transition: color 0.3s;
+    }
+    .status-label.recording { color: var(--red); }
+    .status-label.processing { color: var(--muted); }
+
+    /* Record button */
+    .record-btn {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      border: 2px solid var(--text);
+      background: var(--bg);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s, border-color 0.2s, transform 0.1s;
+      outline: none;
+      margin-bottom: 28px;
+    }
+    .record-btn:hover:not(:disabled) { background: #f5f5f5; }
+    .record-btn:active:not(:disabled) { transform: scale(0.96); }
+    .record-btn:disabled { opacity: 0.4; cursor: default; }
+    .record-btn.recording {
+      border-color: var(--red);
+      background: var(--red);
+    }
+    .record-btn.processing { border-color: var(--border); }
+
+    /* Icon inside button */
+    .btn-icon { pointer-events: none; }
+    .btn-icon .circle {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: var(--text);
+      transition: background 0.2s, border-radius 0.2s, width 0.2s, height 0.2s;
+    }
+    .record-btn.recording .btn-icon .circle {
+      background: #ffffff;
+      border-radius: 4px;
+      width: 24px;
+      height: 24px;
+    }
+    .record-btn.processing .btn-icon .circle {
+      background: var(--border);
+      border-radius: 50%;
+    }
+
+    /* Timer */
+    .timer {
+      font-family: var(--serif);
+      font-size: 36px;
+      font-weight: 300;
+      letter-spacing: -0.02em;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+    .timer.recording { color: var(--red); }
+
+    /* Action hint */
+    .hint {
+      font-family: var(--sans);
+      font-size: 13px;
+      color: var(--faint);
+      margin-bottom: 0;
+    }
+
+    /* Audio level bar */
+    .level-wrap {
+      width: 100%;
+      height: 3px;
+      background: var(--border);
+      margin-top: 28px;
+      overflow: hidden;
+    }
+    .level-bar {
+      height: 100%;
+      background: var(--red);
+      width: 0%;
+      transition: width 0.08s linear;
+    }
+
+    /* ── TRANSCRIPT ── */
+    .transcript-wrap {
+      width: 100%;
+      max-width: 480px;
+      margin-top: 32px;
+      display: none;
+    }
+    .transcript-wrap.visible { display: block; }
+    .transcript-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 20px;
+    }
+    .transcript-title {
+      font-family: var(--sans);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .transcript-meta {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--faint);
+    }
+    .transcript-body {
+      font-family: var(--sans);
+      font-size: 15px;
+      line-height: 1.75;
+      color: var(--text);
+      white-space: pre-wrap;
+    }
+    .segment-line {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    .segment-time {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--faint);
+      white-space: nowrap;
+      margin-top: 3px;
+      min-width: 38px;
+    }
+    .segment-text { line-height: 1.65; }
+
+    /* Copy button */
+    .copy-btn {
+      display: inline-block;
+      margin-top: 24px;
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 8px 14px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--muted);
+      cursor: pointer;
+      transition: border-color 0.15s, color 0.15s;
+    }
+    .copy-btn:hover { border-color: var(--text); color: var(--text); }
+
+    /* ── ERROR ── */
+    .error-box {
+      width: 100%;
+      max-width: 480px;
+      margin-top: 20px;
+      padding: 14px 16px;
+      border: 1px solid #c0392b;
+      font-family: var(--sans);
+      font-size: 13px;
+      color: var(--red);
+      display: none;
+    }
+    .error-box.visible { display: block; }
+
+    /* ── SESSION LIST ── */
+    .sessions-wrap {
+      width: 100%;
+      max-width: 480px;
+      margin-top: 48px;
+      border-top: 1px solid var(--border);
+      padding-top: 24px;
+    }
+    .sessions-label {
+      font-family: var(--sans);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 16px;
+    }
+    .session-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+      cursor: pointer;
+    }
+    .session-item:last-child { border-bottom: none; }
+    .session-item:hover .session-date { color: var(--text); }
+    .session-date {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--muted);
+      transition: color 0.15s;
+    }
+    .session-dur {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--faint);
+    }
+    .sessions-empty {
+      font-family: var(--sans);
+      font-size: 13px;
+      color: var(--faint);
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <span class="logo">Dicto</span>
+  <span class="nav-right" id="nav-date"></span>
+</nav>
+
+<main>
+  <div class="recorder-card">
+    <div class="status-label" id="status">Ready to record</div>
+
+    <button class="record-btn" id="record-btn" aria-label="Record">
+      <div class="btn-icon">
+        <div class="circle"></div>
+      </div>
+    </button>
+
+    <div class="timer" id="timer">00:00</div>
+    <div class="hint" id="hint">Tap to start recording</div>
+
+    <div class="level-wrap">
+      <div class="level-bar" id="level-bar"></div>
+    </div>
+  </div>
+
+  <div class="error-box" id="error-box"></div>
+
+  <div class="transcript-wrap" id="transcript-wrap">
+    <div class="transcript-header">
+      <span class="transcript-title">Transcript</span>
+      <span class="transcript-meta" id="transcript-meta"></span>
+    </div>
+    <div class="transcript-body" id="transcript-body"></div>
+    <button class="copy-btn" id="copy-btn">Copy text</button>
+  </div>
+
+  <div class="sessions-wrap">
+    <div class="sessions-label">Past sessions</div>
+    <div id="sessions-list"><span class="sessions-empty">No sessions yet.</span></div>
+  </div>
+</main>
+
+<script src="recorder.js" type="module"></script>
+</body>
+</html>
