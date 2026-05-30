@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dicto — Roadmap</title>
+  <meta name="description" content="Dicto's build roadmap — five phases from infrastructure to demo-ready product.">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .page-hero { padding: 64px 0 48px; }
+    .page-hero h1 {
+      font-family: var(--mono);
+      font-size: clamp(24px, 4vw, 40px);
+      font-weight: 400;
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+      margin-bottom: 16px;
+    }
+    .page-hero h1 em { font-style: italic; color: var(--muted); }
+    .page-hero p {
+      font-size: 15px;
+      color: var(--muted);
+      max-width: 520px;
+      line-height: 1.65;
+    }
+    .progress-bar-wrap {
+      margin-top: 32px;
+      max-width: 540px;
+    }
+    .progress-label {
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+    }
+    .progress-track {
+      height: 2px;
+      background: var(--border);
+      position: relative;
+    }
+    .progress-fill {
+      height: 2px;
+      background: var(--text);
+      width: 0%;
+      transition: width 1s ease;
+    }
+    .progress-markers {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 8px;
+    }
+    .progress-markers span {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--faint);
+    }
+    .roadmap-section { padding: 0 0 80px; }
+    .phase-deliverable-box {
+      margin-top: 20px;
+      padding: 14px 16px;
+      border: 1px solid var(--border);
+      background: #f9f9f9;
+    }
+    .phase-deliverable-box-label {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--faint);
+      margin-bottom: 6px;
+    }
+    .phase-deliverable-box p {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--text);
+      line-height: 1.5;
+      margin: 0;
+    }
+    .current-tag {
+      display: inline-block;
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 3px 8px;
+      background: var(--text);
+      color: var(--bg);
+      margin-bottom: 12px;
+    }
+    .upcoming-tag {
+      display: inline-block;
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 3px 8px;
+      border: 1px solid var(--border);
+      color: var(--faint);
+      margin-bottom: 12px;
+    }
+    .principle-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0;
+      border: 1px solid var(--border);
+    }
+    .principle {
+      padding: 28px 32px;
+      border-right: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+    .principle:nth-child(2n) { border-right: none; }
+    .principle:nth-last-child(-n+2) { border-bottom: none; }
+    .principle-num {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--faint);
+      margin-bottom: 10px;
+    }
+    .principle h3 {
+      font-family: var(--mono);
+      font-size: 13px;
+      font-weight: 500;
+      margin-bottom: 8px;
+    }
+    .principle p { font-size: 13px; color: var(--muted); line-height: 1.6; }
+    @media (max-width: 768px) {
+      .principle-grid { grid-template-columns: 1fr; }
+      .principle { border-right: none !important; }
+      .principle:nth-last-child(-n+2) { border-bottom: 1px solid var(--border) !important; }
+      .principle:last-child { border-bottom: none !important; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo">Dicto</a>
+    <ul class="nav-links">
+      <li><a href="index.html">Product</a></li>
+      <li><a href="pricing.html">Pricing</a></li>
+      <li><a href="roadmap.html" class="active">Roadmap</a></li>
+      <li><a href="mailto:alexisfy@gmail.com" class="nav-cta">Request Access</a></li>
+    </ul>
+  </div>
+</nav>
+
+<div class="page-hero">
+  <div class="container">
+    <div class="section-label">Build plan · 12 weeks</div>
+    <h1>From zero<br><em>to demo-ready.</em></h1>
+    <p>
+      Five phases. Each one ships a working deliverable. No half-finished features —
+      if it's not done, it's not in the phase. Target: surgeon demo by end of Phase 2,
+      investor-ready product by Phase 5.
+    </p>
+    <div class="progress-bar-wrap">
+      <div class="progress-label">
+        <span>Overall progress</span>
+        <span id="progress-pct">0%</span>
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill" id="progress-fill"></div>
+      </div>
+      <div class="progress-markers">
+        <span>Phase 1</span>
+        <span>Phase 2</span>
+        <span>Phase 3</span>
+        <span>Phase 4</span>
+        <span>Phase 5</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── PHASES ─────────────────────────────────────────── -->
+<section class="roadmap-section">
+  <div class="container">
+    <div class="phase-list">
+
+      <!-- PHASE 1 -->
+      <div class="phase">
+        <div class="phase-meta">
+          <div class="phase-tag">Phase 01</div>
+          <div class="phase-name">Foundation</div>
+          <div class="phase-weeks">Weeks 1 – 2</div>
+          <div style="margin-top:12px;">
+            <span class="current-tag">In progress</span>
+          </div>
+        </div>
+        <div class="phase-body">
+          <div class="phase-deliverable">Deliverable — Server live, patient records creatable via API</div>
+          <p>
+            Everything that everything else depends on. VPS provisioned, Nginx serving HTTPS,
+            Postgres running, patient records writable via API, audio files uploadable to object storage.
+            No UI yet — just a solid foundation.
+          </p>
+          <ul class="task-list">
+            <li>Hostinger VPS provisioning — Ubuntu 24, Nginx, Certbot, SSL</li>
+            <li>Node.js 20 + Python 3.12 + PostgreSQL 16 installed</li>
+            <li>Monorepo scaffold — <code>/api</code>, <code>/web</code>, <code>/transcription</code>, <code>/site</code></li>
+            <li>Drizzle ORM schema + migration runner</li>
+            <li>Patient folder structure + Markdown file generator</li>
+            <li>JWT auth — single doctor login (bcrypt + JWT)</li>
+            <li>Object storage bucket + chunked upload endpoint</li>
+          </ul>
+          <div class="phase-deliverable-box">
+            <div class="phase-deliverable-box-label">Success criterion</div>
+            <p>curl -X POST /patients creates a patient record. curl -X POST /audio uploads a .webm chunk. Both persist across server restarts.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- PHASE 2 -->
+      <div class="phase">
+        <div class="phase-meta">
+          <div class="phase-tag">Phase 02</div>
+          <div class="phase-name">Recording + Diarization</div>
+          <div class="phase-weeks">Weeks 3 – 5</div>
+          <div style="margin-top:12px;">
+            <span class="upcoming-tag">Upcoming</span>
+          </div>
+        </div>
+        <div class="phase-body">
+          <div class="phase-deliverable">Deliverable — Doctor records session, gets speaker-labeled Markdown transcript</div>
+          <p>
+            The core product loop. A doctor opens the web app on their phone, presses Start,
+            records a consultation, and receives a speaker-labeled Markdown transcript within
+            minutes. This is the demo moment for the surgeon friend.
+          </p>
+          <ul class="task-list">
+            <li>Web recorder UI — HTML5 MediaRecorder, chunked upload, VAD auto-pause</li>
+            <li>Start / Pause / Resume button flow + session timer</li>
+            <li>Audio chunk receiver (Node.js) → object storage</li>
+            <li>Python transcription service — Whisper API per chunk, Spanish-first</li>
+            <li>pyannote diarization pipeline — audio → speaker segments → labeled JSON</li>
+            <li>One-time voice enrollment — 30 s sample per speaker (doctor, nurse)</li>
+            <li>Transcript assembler — merge Whisper text + pyannote labels → .md file</li>
+          </ul>
+          <div class="phase-deliverable-box">
+            <div class="phase-deliverable-box-label">Success criterion</div>
+            <p>Doctor records a 10-minute consultation. Within 5 minutes, a Markdown file appears in the patient folder with speaker labels matching doctor and nurse by name.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- PHASE 3 -->
+      <div class="phase">
+        <div class="phase-meta">
+          <div class="phase-tag">Phase 03</div>
+          <div class="phase-name">WhatsApp Scheduling</div>
+          <div class="phase-weeks">Weeks 6 – 7</div>
+          <div style="margin-top:12px;">
+            <span class="upcoming-tag">Upcoming</span>
+          </div>
+        </div>
+        <div class="phase-body">
+          <div class="phase-deliverable">Deliverable — Patient books appointment end-to-end via WhatsApp</div>
+          <p>
+            Patients already use WhatsApp for everything. No new app, no onboarding friction.
+            A YAML-defined conversation script handles the full booking flow — readable and
+            editable by the doctor without touching code.
+          </p>
+          <ul class="task-list">
+            <li>Meta WhatsApp Cloud API — business account + webhook verification</li>
+            <li>Node.js webhook handler — receive, parse, route, reply</li>
+            <li>YAML dialogue script loader + state machine</li>
+            <li>Intent detection + slot filling — appointment type, date, patient ID</li>
+            <li>Google Calendar OAuth 2.0 — read availability, write booking</li>
+            <li>Appointment record in Postgres + patient linked</li>
+            <li>Confirmation messages — patient + doctor WhatsApp notifications</li>
+          </ul>
+          <div class="phase-deliverable-box">
+            <div class="phase-deliverable-box-label">Success criterion</div>
+            <p>Patient sends "quiero agendar" to clinic number. Bot guides them through type, date, and confirmation in under 8 messages. Calendar event appears. Postgres record created.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- PHASE 4 -->
+      <div class="phase">
+        <div class="phase-meta">
+          <div class="phase-tag">Phase 04</div>
+          <div class="phase-name">Insurance Claims</div>
+          <div class="phase-weeks">Weeks 8 – 10</div>
+          <div style="margin-top:12px;">
+            <span class="upcoming-tag">Upcoming</span>
+          </div>
+        </div>
+        <div class="phase-body">
+          <div class="phase-deliverable">Deliverable — Doctor dictates procedure → filled insurance PDF in 2 minutes</div>
+          <p>
+            The moat. Collecting, maintaining, and auto-filling IMSS, ISSSTE, GNP, AXA,
+            and MetLife form templates is a defensible asset that grows with every insurer
+            format added. Voice in — signed PDF out.
+          </p>
+          <ul class="task-list">
+            <li>Guided procedure voice Q&A — agent prompts, doctor answers by voice</li>
+            <li>Whisper transcription + Claude Haiku field extraction → structured record</li>
+            <li>PDF template library — one file per insurer, stored in object storage</li>
+            <li>Field mapping JSON per template — insurer field → patient/procedure field</li>
+            <li>reportlab PDF auto-fill from extracted data</li>
+            <li>Draft review UI — doctor sees filled form, approves or edits inline</li>
+            <li>Final PDF saved to patient folder + object storage</li>
+          </ul>
+          <div class="phase-deliverable-box">
+            <div class="phase-deliverable-box-label">Success criterion</div>
+            <p>Doctor dictates a 3-minute procedure summary. Claude extracts all required IMSS fields. A pre-filled PDF draft is ready for review and signature within 2 minutes.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- PHASE 5 -->
+      <div class="phase">
+        <div class="phase-meta">
+          <div class="phase-tag">Phase 05</div>
+          <div class="phase-name">Polish + Handoff</div>
+          <div class="phase-weeks">Weeks 11 – 12</div>
+          <div style="margin-top:12px;">
+            <span class="upcoming-tag">Upcoming</span>
+          </div>
+        </div>
+        <div class="phase-body">
+          <div class="phase-deliverable">Deliverable — Demo-ready for investor, doctor can use daily</div>
+          <p>
+            Everything that makes the product feel intentional rather than assembled.
+            Mobile-first recorder. Obsidian-compatible wikilinks in all Markdown files.
+            A dashboard with today's schedule, recent transcripts, and pending claims.
+            Automated daily backup so nothing is ever lost.
+          </p>
+          <ul class="task-list">
+            <li>Mobile-first recorder UI refinement — offline-tolerant, graceful reconnect</li>
+            <li>Obsidian wikilinks in all generated Markdown files</li>
+            <li>Dashboard — today's appointments, recent transcripts, pending claims</li>
+            <li>Automated daily backup — Postgres dump + object storage sync</li>
+            <li>Documentation + one-command deployment script</li>
+            <li>Investor demo script + sample patient walkthrough</li>
+          </ul>
+          <div class="phase-deliverable-box">
+            <div class="phase-deliverable-box-label">Success criterion</div>
+            <p>Surgeon friend completes a full week of daily use without reporting a blocker. Product demo runs start-to-finish in under 10 minutes for an investor audience.</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ── DESIGN DECISIONS ────────────────────────────────── -->
+<section style="padding: 64px 0; border-top: 1px solid var(--border);">
+  <div class="container">
+    <div class="section-label">Architecture · 7 key decisions</div>
+    <h2 class="section-title">Why it's built <em>this way</em></h2>
+    <div class="principle-grid">
+      <div class="principle">
+        <div class="principle-num">01</div>
+        <h3>Markdown files as source of truth</h3>
+        <p>Human-readable, Obsidian-compatible, portable. Postgres is the query index — not the primary store for clinical notes. A doctor can always open the folder and read what happened.</p>
+      </div>
+      <div class="principle">
+        <div class="principle-num">02</div>
+        <h3>Self-hosted diarization</h3>
+        <p>pyannote runs on VPS CPU. Slower than GPU, but free and sufficient at MVP scale — roughly 2–3× real-time on 8 GB RAM. No per-minute SaaS fee for speaker separation.</p>
+      </div>
+      <div class="principle">
+        <div class="principle-num">03</div>
+        <h3>Whisper API, not self-hosted</h3>
+        <p>Whisper large-v3 needs ~10 GB GPU VRAM. At $0.006/min it's cheaper to use the API until roughly 200 hours/month of audio — well past the first 50 clinics.</p>
+      </div>
+      <div class="principle">
+        <div class="principle-num">04</div>
+        <h3>Claude Haiku for extraction</h3>
+        <p>Extracting structured fields from a transcript is a well-defined, bounded task. Haiku is 10× cheaper than Sonnet for this workload and fast enough that doctors don't wait.</p>
+      </div>
+      <div class="principle">
+        <div class="principle-num">05</div>
+        <h3>YAML dialogue trees for WhatsApp</h3>
+        <p>The doctor — not a developer — should be able to tweak conversation flows. YAML is readable, editable in any text editor, and version-controlled alongside the codebase.</p>
+      </div>
+      <div class="principle">
+        <div class="principle-num">06</div>
+        <h3>Monorepo on a single VPS</h3>
+        <p>All services in one repo, one server. Easier to deploy, debug, and reason about at MVP scale. Split into separate services when the workload actually demands it — not before.</p>
+      </div>
+      <div class="principle">
+        <div class="principle-num">07</div>
+        <h3>Insurance templates as moat</h3>
+        <p>Collecting and maintaining IMSS, ISSSTE, GNP, AXA, MetLife form templates is the durable competitive advantage. Each format added makes the product harder to clone and more valuable to existing users.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── CTA ─────────────────────────────────────────────── -->
+<section style="padding: 64px 0; border-top: 1px solid var(--border);">
+  <div class="container">
+    <div class="cta-band">
+      <h2>Following the build?<br><em>Get notified when Phase 2 ships.</em></h2>
+      <div class="cta-form">
+        <input type="email" class="cta-input" placeholder="your@email.com">
+        <a href="mailto:alexisfy@gmail.com" class="btn-primary">Notify me</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-left">© 2026 Dicto · Medical Practice Intelligence</div>
+    <ul class="footer-links">
+      <li><a href="index.html">Product</a></li>
+      <li><a href="pricing.html">Pricing</a></li>
+      <li><a href="mailto:alexisfy@gmail.com">Contact</a></li>
+    </ul>
+  </div>
+</footer>
+
+<script>
+  // Animate progress bar on load
+  window.addEventListener('load', function() {
+    const fill = document.getElementById('progress-fill');
+    const pct  = document.getElementById('progress-pct');
+    // Phase 1 in progress = ~8% through a 12-week plan
+    const target = 8;
+    fill.style.width = target + '%';
+    pct.textContent = target + '%';
+  });
+</script>
+
+</body>
+</html>

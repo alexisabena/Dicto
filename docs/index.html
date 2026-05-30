@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dicto — Medical Practice Intelligence</title>
+  <meta name="description" content="Dicto listens, transcribes, schedules, and files — turning doctor voice into structured records and insurance claims automatically.">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .hero-meta {
+      margin-top: 48px;
+      display: flex;
+      align-items: center;
+      gap: 32px;
+    }
+    .hero-meta span {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--faint);
+      letter-spacing: 0.06em;
+    }
+    .hero-meta span::before {
+      content: '·';
+      margin-right: 8px;
+    }
+    .hero-meta span:first-child::before { content: ''; }
+    .testimonial {
+      padding: 56px 0;
+      border-top: 1px solid var(--border);
+    }
+    blockquote {
+      max-width: 640px;
+    }
+    blockquote p {
+      font-family: var(--sans);
+      font-size: 20px;
+      line-height: 1.6;
+      color: var(--text);
+      font-style: italic;
+      margin-bottom: 20px;
+    }
+    blockquote cite {
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      font-style: normal;
+    }
+    .tech-strip {
+      border: 1px solid var(--border);
+      display: flex;
+      overflow: hidden;
+    }
+    .tech-item {
+      flex: 1;
+      padding: 20px 24px;
+      border-right: 1px solid var(--border);
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .tech-item:last-child { border-right: none; }
+    .tech-item span {
+      display: block;
+      font-size: 13px;
+      color: var(--text);
+      margin-bottom: 4px;
+      font-weight: 500;
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo">Dicto</a>
+    <ul class="nav-links">
+      <li><a href="index.html" class="active">Product</a></li>
+      <li><a href="pricing.html">Pricing</a></li>
+      <li><a href="roadmap.html">Roadmap</a></li>
+      <li><a href="mailto:alexisfy@gmail.com" class="nav-cta">Request Access</a></li>
+    </ul>
+  </div>
+</nav>
+
+<!-- ── HERO ──────────────────────────────────────────── -->
+<section class="hero">
+  <div class="container">
+    <div class="hero-label">Medical Practice Intelligence · Mexico · 2026</div>
+    <h1>Voice in.<br><em>Records out.</em></h1>
+    <p class="hero-sub">
+      Dicto listens to your consultations, labels every speaker, transcribes in Spanish,
+      schedules patients via WhatsApp, and files insurance claims — automatically.
+      Built for independent surgeons and specialists.
+    </p>
+    <a href="mailto:alexisfy@gmail.com" class="btn-primary">Join the waitlist</a>
+    <a href="pricing.html" class="btn-secondary">See the cost model</a>
+    <div class="hero-meta">
+      <span>~$24/mo to operate</span>
+      <span>63 % margin from clinic 1</span>
+      <span>IMSS · ISSSTE · GNP · AXA · MetLife</span>
+      <span>Spanish + English</span>
+    </div>
+  </div>
+</section>
+
+<!-- ── STATS ──────────────────────────────────────────── -->
+<section style="padding: 0;">
+  <div class="container" style="padding-top: 0; padding-bottom: 0;">
+    <div class="stat-row">
+      <div class="stat">
+        <div class="stat-value">$0.006</div>
+        <div class="stat-label">per transcribed minute</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value">5</div>
+        <div class="stat-label">simultaneous speakers</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value">&lt;2 min</div>
+        <div class="stat-label">claim PDF generated</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value">1000</div>
+        <div class="stat-label">free WhatsApp convos/mo</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── FEATURES ───────────────────────────────────────── -->
+<section>
+  <div class="container">
+    <div class="section-label">Core capabilities</div>
+    <h2 class="section-title">Everything your practice <em>dictates</em></h2>
+    <div class="feature-grid">
+
+      <div class="feature-card">
+        <div class="feature-num">01 / Recording</div>
+        <h3>Session recording + diarization</h3>
+        <p>Open the web app on any phone or desktop. Press Start. Dicto records up to an hour of consultation audio, separates up to five speakers — doctor, nurse, patient, family — and labels each one by name after a one-time 30-second voice enrollment.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-num">02 / Transcription</div>
+        <h3>Spanish-first medical transcription</h3>
+        <p>Every chunk of audio is sent to OpenAI Whisper the moment it lands. The result is a timestamped, speaker-tagged Markdown file saved to the patient folder — readable in any editor, Obsidian-compatible, zero proprietary lock-in.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-num">03 / Scheduling</div>
+        <h3>WhatsApp appointment booking</h3>
+        <p>Patients message your clinic number. Dicto's conversation agent — defined in plain YAML, customizable without code — reads your calendar, proposes slots, and books the appointment. Confirmation goes to the patient and to you. No receptionist required.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-num">04 / Insurance</div>
+        <h3>Auto-filled insurance claim PDFs</h3>
+        <p>After a procedure, answer guided voice questions about diagnosis, materials, and complications. Dicto extracts the structured fields, maps them to the correct insurer form (IMSS, ISSSTE, GNP, AXA, MetLife, and more), and generates a draft PDF for your review in under two minutes.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-num">05 / Patient Files</div>
+        <h3>Structured patient folders</h3>
+        <p>Each patient gets a dedicated folder: demographics, consultation notes, procedure records, claims, and raw audio — all linked by wikilinks. Open the folder in Obsidian and your practice becomes a visual knowledge graph. No proprietary database needed.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-num">06 / Cost</div>
+        <h3>Designed to be affordable</h3>
+        <p>Dicto runs on a single $9 VPS and costs roughly $24/mo at MVP scale. Whisper is billed at $0.006 per minute of audio. There are no per-seat fees, no VC-backed pricing surprises. One paying clinic covers the entire infrastructure.</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ── HOW IT WORKS ────────────────────────────────────── -->
+<section>
+  <div class="container">
+    <div class="section-label">How it works</div>
+    <h2 class="section-title">Three steps. <em>Zero paperwork.</em></h2>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">01</div>
+        <h3>You speak. Dicto listens.</h3>
+        <p>Press Start on any device. The session records continuously, auto-pausing in silence and resuming when you speak. All audio is chunked and uploaded in real time — if you lose connection, nothing is lost.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">02</div>
+        <h3>Transcription and labeling happen automatically.</h3>
+        <p>Each audio chunk goes through Whisper for transcription and pyannote for speaker diarization. The output is a clean, speaker-labeled Markdown file in the patient's folder within minutes of the session ending.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">03</div>
+        <h3>Records and claims are filed.</h3>
+        <p>Consultation notes are saved. If it was a procedure, a guided Q&A fills the insurance claim form. If the patient needs a follow-up, WhatsApp handles the booking. You sign off, Dicto files.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── TECH ────────────────────────────────────────────── -->
+<section>
+  <div class="container">
+    <div class="section-label">Technology</div>
+    <h2 class="section-title">Built on tools that <em>cost less</em> than the alternatives</h2>
+    <div class="tech-strip">
+      <div class="tech-item"><span>OpenAI Whisper</span>Transcription API</div>
+      <div class="tech-item"><span>pyannote 3.1</span>Speaker diarization</div>
+      <div class="tech-item"><span>Claude Haiku</span>Field extraction</div>
+      <div class="tech-item"><span>Meta Cloud API</span>WhatsApp webhook</div>
+      <div class="tech-item"><span>PostgreSQL + Drizzle</span>Records index</div>
+      <div class="tech-item"><span>Hostinger VPS</span>$9/mo, self-hosted</div>
+    </div>
+  </div>
+</section>
+
+<!-- ── TESTIMONIAL ────────────────────────────────────── -->
+<section class="testimonial">
+  <div class="container">
+    <blockquote>
+      <p>"I spend forty minutes after every surgery filling out the same IMSS form.
+      If Dicto can do that in two minutes from my voice notes, it pays for itself
+      the first week."</p>
+      <cite>— Surgeon, first test user, Mexico City</cite>
+    </blockquote>
+  </div>
+</section>
+
+<!-- ── CTA ────────────────────────────────────────────── -->
+<section>
+  <div class="container">
+    <div class="cta-band">
+      <h2>Early access is open to <em>independent doctors and small clinics.</em></h2>
+      <div class="cta-form">
+        <input type="email" class="cta-input" placeholder="your@email.com">
+        <a href="mailto:alexisfy@gmail.com" class="btn-primary">Request access</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-left">© 2026 Dicto · Medical Practice Intelligence</div>
+    <ul class="footer-links">
+      <li><a href="pricing.html">Pricing</a></li>
+      <li><a href="roadmap.html">Roadmap</a></li>
+      <li><a href="mailto:alexisfy@gmail.com">Contact</a></li>
+    </ul>
+  </div>
+</footer>
+
+</body>
+</html>
