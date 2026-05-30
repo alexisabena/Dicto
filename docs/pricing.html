@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dicto — Cost Estimator</title>
-  <meta name="description" content="See exactly what Dicto costs to run at any scale — from one clinic to one hundred.">
+  <title>Expedicta — Cost Estimator</title>
+  <meta name="description" content="See exactly what Expedicta costs to run at any scale — from one clinic to one hundred.">
   <link rel="stylesheet" href="style.css">
   <style>
     .page-hero { padding: 64px 0 48px; }
@@ -175,7 +175,7 @@
 
 <nav>
   <div class="nav-inner">
-    <a href="index.html" class="nav-logo">Dicto</a>
+    <a href="index.html" class="nav-logo">Expedicta</a>
     <ul class="nav-links">
       <li><a href="index.html">Product</a></li>
       <li><a href="pricing.html" class="active">Pricing</a></li>
@@ -189,7 +189,7 @@
     <div class="section-label">Cost model</div>
     <h1>What it costs<br><em>to run your practice.</em></h1>
     <p>
-      Every dollar Dicto spends to serve you is accounted for below —
+      Every dollar Expedicta spends to serve you is accounted for below —
       infrastructure, transcription, AI, storage. Adjust the sliders
       to see the exact operating cost at your scale.
     </p>
@@ -250,7 +250,7 @@
       <!-- OUTPUT -->
       <div class="estimator-output">
 
-        <div class="out-header-label">Monthly cost to run your practice on Dicto</div>
+        <div class="out-header-label">Monthly cost to run your practice on Expedicta</div>
         <div class="out-big-cost" id="out-total">$–</div>
         <div class="out-subtext" id="out-context">–</div>
 
@@ -454,7 +454,7 @@
 
 <footer>
   <div class="footer-inner">
-    <div class="footer-left">© 2026 Dicto · Medical Practice Intelligence</div>
+    <div class="footer-left">© 2026 Expedicta · Medical Practice Intelligence</div>
     <ul class="footer-links">
       <li><a href="index.html">Product</a></li>
       <li><a href="mailto:alexisfy@gmail.com">Contact</a></li>
@@ -484,24 +484,28 @@
     const totalAudioMin = totalSessions * minutes;
     const totalAudioHrs = (totalAudioMin / 60).toFixed(1);
 
-    let vpsCost = 8.99;
-    if (clinics > 50)      vpsCost = 37.97;
-    else if (clinics > 20) vpsCost = 17.98;
+    // Hetzner CX32 ~$10/mo; storage on local NVMe at MVP scale
+    // Scale thresholds: >20 clinics add transcription server, >50 add DB/LB
+    let vpsCost = 10;
+    if (clinics > 50)      vpsCost = 50;   // CX32 + CX22 transcription + CX21 DB
+    else if (clinics > 20) vpsCost = 20;   // CX32 + CX22 dedicated transcription
 
-    const audioStorageMB = totalSessions * (minutes / 30) * 20;
-    const totalStorageGB = (audioStorageMB + totalSessions * 0.1) / 1024;
-    const storageCost    = Math.max(3.99, Math.ceil(totalStorageGB / 100) * 3.99);
-    const infraCost      = vpsCost + storageCost;
-    const whisperCost    = totalAudioMin * 0.006;
-    const claudeCost     = totalSessions * (3000 / 1000000) * 0.80
-                         + totalSessions * (500  / 1000000) * 4.00;
-    const totalCost      = infraCost + whisperCost + claudeCost + 0.83;
+    // Object storage only needed at scale (>20 clinics local disk fills up)
+    const storageCost = clinics > 20
+      ? Math.max(6, Math.ceil(totalSessions * (minutes / 30) * 20 / 1024 / 1000) * 6)
+      : 0;
+
+    const infraCost   = vpsCost + storageCost;
+    const whisperCost = totalAudioMin * 0.006;
+    const claudeCost  = totalSessions * (3000 / 1000000) * 0.80
+                      + totalSessions * (500  / 1000000) * 4.00;
+    const totalCost   = infraCost + whisperCost + claudeCost + 0.83;
 
     let threshMsg;
-    if      (clinics <= 5)  threshMsg = 'Single VPS ($8.99/mo) handles all workload comfortably.';
-    else if (clinics <= 20) threshMsg = 'Single VPS sufficient. Consider PgBouncer at 15+ clinics.';
-    else if (clinics <= 50) threshMsg = 'Add a second VPS ($8.99/mo) for the transcription service.';
-    else                    threshMsg = 'Load balancer + dedicated DB server recommended (~$20/mo extra).';
+    if      (clinics <= 5)  threshMsg = 'Hetzner CX32 ($10/mo) handles all workload comfortably.';
+    else if (clinics <= 20) threshMsg = 'Hetzner CX32 sufficient. Add PgBouncer connection pool at 15+ clinics.';
+    else if (clinics <= 50) threshMsg = 'Add a Hetzner CX22 ($6/mo) dedicated to the transcription service.';
+    else                    threshMsg = 'Add a CX21 for the DB and a load balancer. ~$20/mo extra.';
 
     document.getElementById('out-total').textContent     = fmt(totalCost);
     document.getElementById('out-context').textContent   =

@@ -1,8 +1,8 @@
-# Dicto — Project Context for Claude Code
+# Expedicta — Project Context for Claude Code
 
-## What is Dicto?
+## What is Expedicta?
 
-Dicto is a medical practice intelligence platform built for independent doctors and small clinics. It listens, transcribes, organizes, schedules, and files — turning voice into structured medical records and insurance claims automatically.
+Expedicta is a medical practice intelligence platform built for independent doctors and small clinics. It listens, transcribes, organizes, schedules, and files — turning voice into structured medical records and insurance claims automatically.
 
 The name comes from the Latin "dictare" (to dictate). It is clean, medical, and memorable.
 
@@ -85,7 +85,7 @@ Markdown files are Obsidian-compatible: YAML frontmatter + wikilinks between nod
 ### Infrastructure
 - **Host:** Hostinger KVM 2 VPS — $8.99/mo — 2 vCPU, 8 GB RAM, 100 GB NVMe, Ubuntu 24
 - **Object storage:** Hostinger Object Storage — $3.99/mo — audio files, PDFs, MD files
-- **Domain:** ~$10/yr — dicto.health or similar
+- **Domain:** ~$10/yr — expedicta.com or similar
 - **SSL:** Let's Encrypt (free, auto-renew via Certbot)
 - **Reverse proxy:** Nginx
 
@@ -156,7 +156,7 @@ Infrastructure scales slowly (add VPS at ~20 clinics). AI costs are linear but s
 
 ---
 
-## Website (dicto.health or similar)
+## Website (expedicta.com or similar)
 
 Three-page static site hosted on Vercel or Hostinger static hosting (free/included).
 
@@ -254,7 +254,7 @@ When asking Claude Code to build, reference this file with:
 - The insurance template library is the business moat — start collecting formats early
 - First market: independent surgeons in Mexico
 - Pricing: $50–80/mo per clinic, billed monthly, no annual lock-in for MVP
-- Name: **Dicto** (from "dictare" — to dictate). Domain: dicto.health preferred
+- Name: **Expedicta** (from "dictare" — to dictate). Domain: expedicta.com preferred
 - The doctor friend is the first test user AND first paying customer
 - Investor conversation is in early stages — needs a clean demo by end of Phase 2
 

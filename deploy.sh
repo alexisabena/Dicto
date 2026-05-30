@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
-# Dicto — VPS bootstrap + deploy
+# Expedicta — VPS bootstrap + deploy
 # Run once on a fresh Hostinger KVM2 (Ubuntu 24)
 # Usage: bash deploy.sh
 
 set -euo pipefail
 
-REPO="https://github.com/alexisabena/Dicto.git"
-APP_DIR="/opt/dicto"
-DATA_DIR="/var/dicto/data"
+REPO="https://github.com/alexisabena/Expedicta.git"
+APP_DIR="/opt/expedicta"
+DATA_DIR="/var/expedicta/data"
 NODE_VERSION="20"
 DOMAIN="${DOMAIN:-}"   # set DOMAIN=yourdomain.com before running
 
@@ -48,9 +48,9 @@ EOF
 fi
 
 echo "==> Installing systemd service"
-cat > /etc/systemd/system/dicto.service << EOF
+cat > /etc/systemd/system/expedicta.service << EOF
 [Unit]
-Description=Dicto API
+Description=Expedicta API
 After=network.target
 
 [Service]
@@ -67,11 +67,11 @@ WantedBy=multi-user.target
 EOF
 
 systemctl daemon-reload
-systemctl enable dicto
-systemctl restart dicto
+systemctl enable expedicta
+systemctl restart expedicta
 
 echo "==> Configuring Nginx"
-cat > /etc/nginx/sites-available/dicto << EOF
+cat > /etc/nginx/sites-available/expedicta << EOF
 server {
     listen 80;
     server_name ${DOMAIN:-_};
@@ -90,7 +90,7 @@ server {
 }
 EOF
 
-ln -sf /etc/nginx/sites-available/dicto /etc/nginx/sites-enabled/dicto
+ln -sf /etc/nginx/sites-available/expedicta /etc/nginx/sites-enabled/expedicta
 rm -f /etc/nginx/sites-enabled/default
 nginx -t && systemctl reload nginx
 
@@ -100,11 +100,11 @@ if [ -n "$DOMAIN" ]; then
 fi
 
 echo ""
-echo "Done. Dicto is running at http://${DOMAIN:-$(curl -s ifconfig.me)}"
+echo "Done. Expedicta is running at http://${DOMAIN:-$(curl -s ifconfig.me)}"
 echo ""
 echo "Next steps:"
 echo "  1. Edit $APP_DIR/api/.env — add OPENAI_API_KEY"
-echo "  2. systemctl restart dicto"
+echo "  2. systemctl restart expedicta"
 if [ -z "$DOMAIN" ]; then
   echo "  3. Point your domain to this server, then rerun with DOMAIN=yourdomain.com bash deploy.sh"
 fi

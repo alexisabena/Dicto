@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dicto — Business Model</title>
+  <title>Expedicta — Business Model</title>
   <meta name="robots" content="noindex, nofollow">
   <link rel="stylesheet" href="style.css">
   <style>
@@ -168,7 +168,7 @@
 
 <nav>
   <div class="nav-inner">
-    <a href="index.html" class="nav-logo">Dicto</a>
+    <a href="index.html" class="nav-logo">Expedicta</a>
     <ul class="nav-links">
       <li><a href="index.html">Product</a></li>
       <li><a href="pricing.html">Pricing</a></li>
@@ -183,7 +183,7 @@
     <h1>Revenue, cost,<br><em>and margin.</em></h1>
     <p>
       This page is shared selectively. It shows the full picture:
-      what Dicto charges, what it costs to run, and the margin at every scale.
+      what Expedicta charges, what it costs to run, and the margin at every scale.
     </p>
   </div>
 </div>
@@ -335,39 +335,39 @@
       </thead>
       <tbody>
         <tr>
-          <td>1</td><td>$23.97</td>
-          <td class="vol-green">$65</td><td class="vol-green">$41.03</td>
-          <td class="vol-green">63%</td><td class="vol-gray">Single VPS</td>
+          <td>1</td><td>$14.52</td>
+          <td class="vol-green">$65</td><td class="vol-green">$50.48</td>
+          <td class="vol-green">78%</td><td class="vol-gray">Hetzner CX32</td>
         </tr>
         <tr class="highlight">
-          <td>5</td><td>$51.80</td>
-          <td class="vol-green">$325</td><td class="vol-green">$273.20</td>
-          <td class="vol-green">84%</td><td class="vol-gray">Single VPS</td>
+          <td>5</td><td>$29.28</td>
+          <td class="vol-green">$325</td><td class="vol-green">$295.72</td>
+          <td class="vol-green">91%</td><td class="vol-gray">Hetzner CX32</td>
         </tr>
         <tr>
-          <td>10</td><td>$89.60</td>
-          <td class="vol-green">$650</td><td class="vol-green">$560.40</td>
-          <td class="vol-green">86%</td><td class="vol-gray">Single VPS</td>
+          <td>10</td><td>$48.73</td>
+          <td class="vol-green">$650</td><td class="vol-green">$601.27</td>
+          <td class="vol-green">92%</td><td class="vol-gray">Hetzner CX32</td>
         </tr>
         <tr class="highlight">
-          <td>20</td><td>$165.20</td>
-          <td class="vol-green">$1,300</td><td class="vol-green">$1,134.80</td>
-          <td class="vol-green">87%</td><td class="vol-gray">Single VPS (at limit)</td>
+          <td>20</td><td>$85.63</td>
+          <td class="vol-green">$1,300</td><td class="vol-green">$1,214.37</td>
+          <td class="vol-green">93%</td><td class="vol-gray">CX32 (at limit)</td>
         </tr>
         <tr>
-          <td>25</td><td>$207.00</td>
-          <td class="vol-green">$1,625</td><td class="vol-green">$1,418.00</td>
-          <td class="vol-green">87%</td><td class="vol-gray">+ Transcription VPS</td>
+          <td>25</td><td>$113.03</td>
+          <td class="vol-green">$1,625</td><td class="vol-green">$1,511.97</td>
+          <td class="vol-green">93%</td><td class="vol-gray">+ CX22 transcription</td>
         </tr>
         <tr class="highlight">
-          <td>50</td><td>$396.00</td>
-          <td class="vol-green">$3,250</td><td class="vol-green">$2,854.00</td>
-          <td class="vol-green">88%</td><td class="vol-gray">+ Transcription VPS</td>
+          <td>50</td><td>$215.23</td>
+          <td class="vol-green">$3,250</td><td class="vol-green">$3,034.77</td>
+          <td class="vol-green">93%</td><td class="vol-gray">+ CX22 transcription</td>
         </tr>
         <tr>
-          <td>100</td><td>$810.00</td>
-          <td class="vol-green">$6,500</td><td class="vol-green">$5,690.00</td>
-          <td class="vol-green">88%</td><td class="vol-gray">Load balancer + DB</td>
+          <td>100</td><td>$469.63</td>
+          <td class="vol-green">$6,500</td><td class="vol-green">$6,030.37</td>
+          <td class="vol-green">93%</td><td class="vol-gray">CX32 + CX22 + CX21 DB</td>
         </tr>
       </tbody>
     </table>
@@ -377,7 +377,7 @@
 
 <footer>
   <div class="footer-inner">
-    <div class="footer-left">© 2026 Dicto · Internal view — not indexed</div>
+    <div class="footer-left">© 2026 Expedicta · Internal view — not indexed</div>
     <ul class="footer-links">
       <li><a href="index.html">Product</a></li>
       <li><a href="pricing.html">Public pricing</a></li>
@@ -410,27 +410,31 @@
     const totalAudioMin = totalSessions * minutes;
     const totalAudioHrs = (totalAudioMin / 60).toFixed(1);
 
-    let vpsCost = 8.99;
-    if (clinics > 50)      vpsCost = 37.97;
-    else if (clinics > 20) vpsCost = 17.98;
+    // Hetzner CX32 ~$10/mo; storage on local NVMe at MVP scale
+    // Scale thresholds: >20 clinics add transcription server, >50 add DB/LB
+    let vpsCost = 10;
+    if (clinics > 50)      vpsCost = 50;   // CX32 + CX22 transcription + CX21 DB
+    else if (clinics > 20) vpsCost = 20;   // CX32 + CX22 dedicated transcription
 
-    const audioStorageMB = totalSessions * (minutes / 30) * 20;
-    const totalStorageGB = (audioStorageMB + totalSessions * 0.1) / 1024;
-    const storageCost    = Math.max(3.99, Math.ceil(totalStorageGB / 100) * 3.99);
-    const infraCost      = vpsCost + storageCost;
-    const whisperCost    = totalAudioMin * 0.006;
-    const claudeCost     = totalSessions * (3000 / 1000000) * 0.80
-                         + totalSessions * (500  / 1000000) * 4.00;
-    const totalCost      = infraCost + whisperCost + claudeCost + 0.83;
+    // Object storage only needed at scale (>20 clinics local disk fills up)
+    const storageCost = clinics > 20
+      ? Math.max(6, Math.ceil(totalSessions * (minutes / 30) * 20 / 1024 / 1000) * 6)
+      : 0;
+
+    const infraCost   = vpsCost + storageCost;
+    const whisperCost = totalAudioMin * 0.006;
+    const claudeCost  = totalSessions * (3000 / 1000000) * 0.80
+                      + totalSessions * (500  / 1000000) * 4.00;
+    const totalCost   = infraCost + whisperCost + claudeCost + 0.83;
     const revenue        = clinics * price;
     const profit         = revenue - totalCost;
     const margin         = revenue > 0 ? (profit / revenue) * 100 : 0;
 
     let threshMsg;
-    if      (clinics <= 5)  threshMsg = 'Single VPS ($8.99/mo) handles all workload comfortably.';
-    else if (clinics <= 20) threshMsg = 'Single VPS sufficient. Consider PgBouncer at 15+ clinics.';
-    else if (clinics <= 50) threshMsg = 'Add a second VPS ($8.99/mo) for the transcription service.';
-    else                    threshMsg = 'Load balancer + dedicated DB server recommended (~$20/mo extra).';
+    if      (clinics <= 5)  threshMsg = 'Hetzner CX32 ($10/mo) handles all workload comfortably.';
+    else if (clinics <= 20) threshMsg = 'Hetzner CX32 sufficient. Add PgBouncer connection pool at 15+ clinics.';
+    else if (clinics <= 50) threshMsg = 'Add a Hetzner CX22 ($6/mo) dedicated to the transcription service.';
+    else                    threshMsg = 'Add a CX21 for the DB and a load balancer. ~$20/mo extra.';
 
     document.getElementById('out-revenue').textContent  = fmt(revenue);
     document.getElementById('out-margin').textContent   = margin.toFixed(1) + '%';
