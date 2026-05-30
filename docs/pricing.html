@@ -68,6 +68,29 @@
       font-size: 13px;
       color: var(--text);
     }
+    .out-header-label {
+      font-family: var(--sans);
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 12px;
+    }
+    .out-big-cost {
+      font-family: var(--serif);
+      font-size: 56px;
+      font-weight: 300;
+      letter-spacing: -0.03em;
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+    .out-subtext {
+      font-family: var(--sans);
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 28px;
+    }
     .out-detail-toggle {
       font-family: var(--sans);
       font-size: 12px;
@@ -165,11 +188,11 @@
 <div class="page-hero">
   <div class="container">
     <div class="section-label">Cost model</div>
-    <h1>Transparent costs.<br><em>Real margin.</em></h1>
+    <h1>What it costs<br><em>to run your practice.</em></h1>
     <p>
-      Every dollar Dicto costs to run is accounted for below — infrastructure,
-      transcription, AI, storage. Adjust the sliders to see exactly what the
-      platform costs and earns at your scale.
+      Every dollar Dicto spends to serve you is accounted for below —
+      infrastructure, transcription, AI, storage. Adjust the sliders
+      to see the exact operating cost at your scale.
     </p>
   </div>
 </div>
@@ -219,18 +242,6 @@
           </div>
         </div>
 
-        <div class="slider-group">
-          <div class="slider-header">
-            <span class="slider-label">Price per clinic / month</span>
-            <span class="slider-value">$<span id="val-price">65</span></span>
-          </div>
-          <input type="range" id="sl-price" min="40" max="120" value="65" step="5">
-          <div style="display:flex;justify-content:space-between;margin-top:6px;">
-            <span style="font-family:var(--mono);font-size:10px;color:var(--faint);">$40</span>
-            <span style="font-family:var(--mono);font-size:10px;color:var(--faint);">$120</span>
-          </div>
-        </div>
-
         <div class="threshold-box">
           <div class="threshold-label">Infrastructure note</div>
           <div class="threshold-msg" id="threshold-msg">Single VPS handles all workload at this scale.</div>
@@ -240,43 +251,24 @@
       <!-- OUTPUT -->
       <div class="estimator-output">
 
-        <div class="out-metric-grid">
-          <div class="out-metric">
-            <div class="out-metric-val" id="out-revenue">$–</div>
-            <div class="out-metric-label">Monthly revenue</div>
-          </div>
-          <div class="out-metric">
-            <div class="out-metric-val accent" id="out-margin">–%</div>
-            <div class="out-metric-label">Gross margin</div>
-          </div>
-          <div class="out-metric">
-            <div class="out-metric-val" id="out-profit">$–</div>
-            <div class="out-metric-label">Monthly profit</div>
-          </div>
-        </div>
-
-        <div class="out-cost-line">
-          Platform costs <span id="out-total">$–</span> / month to operate
-        </div>
+        <div class="out-header-label">Monthly cost to run your practice on Dicto</div>
+        <div class="out-big-cost" id="out-total">$–</div>
+        <div class="out-subtext" id="out-context">–</div>
 
         <div class="out-detail-toggle" id="detail-toggle" onclick="toggleDetail()">
-          Show cost breakdown ↓
+          Show breakdown ↓
         </div>
         <div class="out-detail" id="out-detail">
           <div class="output-row">
-            <span class="label">Infrastructure</span>
+            <span class="label">Infrastructure (VPS + storage)</span>
             <span class="val" id="out-vps">–</span>
           </div>
           <div class="output-row">
-            <span class="label">Object storage</span>
-            <span class="val" id="out-storage">–</span>
-          </div>
-          <div class="output-row">
-            <span class="label">Whisper API (<span id="out-audio-min">–</span> min)</span>
+            <span class="label">Whisper API (<span id="out-audio-min">–</span> min audio)</span>
             <span class="val" id="out-whisper">–</span>
           </div>
           <div class="output-row">
-            <span class="label">Claude Haiku</span>
+            <span class="label">Claude Haiku (field extraction)</span>
             <span class="val" id="out-claude">–</span>
           </div>
           <div class="output-row">
@@ -287,14 +279,8 @@
 
         <div class="threshold-box" style="margin-top: 24px;">
           <div class="threshold-label">Infrastructure note</div>
-          <div class="threshold-msg" id="threshold-msg">Single VPS handles all workload at this scale.</div>
+          <div class="threshold-msg" id="threshold-msg-2">Single VPS handles all workload at this scale.</div>
         </div>
-
-        <!-- hidden ids kept for JS compatibility -->
-        <span id="out-total-2" style="display:none"></span>
-        <span id="out-clinics-rev" style="display:none"></span>
-        <span id="out-price-rev" style="display:none"></span>
-        <span id="out-margin-badge" style="display:none"></span>
       </div>
     </div>
   </div>
@@ -449,10 +435,6 @@
         <span>Claude Haiku</span>
         <span id="sb-claude">$–</span>
       </div>
-      <div class="sticky-detail-row">
-        <span>Profit</span>
-        <span id="sb-profit">$–</span>
-      </div>
     </div>
   </div>
   <div class="sticky-bar-summary">
@@ -461,12 +443,12 @@
       <div class="sticky-bar-label">Cost / mo</div>
     </div>
     <div class="sticky-bar-item">
-      <div class="sticky-bar-val" id="sb-revenue">$–</div>
-      <div class="sticky-bar-label">Revenue</div>
+      <div class="sticky-bar-val" id="sb-sessions">–</div>
+      <div class="sticky-bar-label">Sessions</div>
     </div>
     <div class="sticky-bar-item">
-      <div class="sticky-bar-val positive" id="sb-margin">–%</div>
-      <div class="sticky-bar-label">Margin</div>
+      <div class="sticky-bar-val" id="sb-audio">–</div>
+      <div class="sticky-bar-label">Audio hrs</div>
     </div>
   </div>
 </div>
@@ -486,7 +468,6 @@
   const slClinics  = document.getElementById('sl-clinics');
   const slSessions = document.getElementById('sl-sessions');
   const slMinutes  = document.getElementById('sl-minutes');
-  const slPrice    = document.getElementById('sl-price');
 
   function fmt(n) {
     return '$' + n.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
@@ -496,89 +477,50 @@
     const clinics  = parseInt(slClinics.value);
     const sessions = parseInt(slSessions.value);
     const minutes  = parseInt(slMinutes.value);
-    const price    = parseInt(slPrice.value);
 
     document.getElementById('val-clinics').textContent  = clinics;
     document.getElementById('val-sessions').textContent = sessions;
     document.getElementById('val-minutes').textContent  = minutes;
-    document.getElementById('val-price').textContent    = price;
 
-    // ── Cost calculation ──────────────────────────────
-    const totalSessions   = clinics * sessions;
-    const totalAudioMin   = totalSessions * minutes;
+    const totalSessions = clinics * sessions;
+    const totalAudioMin = totalSessions * minutes;
+    const totalAudioHrs = (totalAudioMin / 60).toFixed(1);
 
-    // Infrastructure — step function
     let vpsCost = 8.99;
-    if (clinics > 50) {
-      vpsCost = 8.99 + 8.99 + 20.00; // main + transcription + load balancer
-    } else if (clinics > 20) {
-      vpsCost = 8.99 + 8.99;          // main + dedicated transcription VPS
-    }
+    if (clinics > 50)      vpsCost = 37.97;
+    else if (clinics > 20) vpsCost = 17.98;
 
-    // Storage: ~20 MB per 30-min session (linear with audio); base 100 GB = $3.99
-    const audioStorageMB  = totalSessions * (minutes / 30) * 20;
-    const docStorageMB    = totalSessions * 0.1;   // transcripts, PDFs
-    const totalStorageGB  = (audioStorageMB + docStorageMB) / 1024;
-    const storageCost     = Math.max(3.99, Math.ceil(totalStorageGB / 100) * 3.99);
+    const audioStorageMB = totalSessions * (minutes / 30) * 20;
+    const totalStorageGB = (audioStorageMB + totalSessions * 0.1) / 1024;
+    const storageCost    = Math.max(3.99, Math.ceil(totalStorageGB / 100) * 3.99);
+    const infraCost      = vpsCost + storageCost;
+    const whisperCost    = totalAudioMin * 0.006;
+    const claudeCost     = totalSessions * (3000 / 1000000) * 0.80
+                         + totalSessions * (500  / 1000000) * 4.00;
+    const totalCost      = infraCost + whisperCost + claudeCost + 0.83;
 
-    const domainCost      = 0.83;
-
-    // Whisper
-    const whisperCost     = totalAudioMin * 0.006;
-
-    // Claude Haiku: $0.80/M input, $4/M output; ~3000 in + 500 out per session
-    const claudeInputCost  = totalSessions * (3000 / 1_000_000) * 0.80;
-    const claudeOutputCost = totalSessions * (500  / 1_000_000) * 4.00;
-    const claudeCost       = claudeInputCost + claudeOutputCost;
-
-    const totalFixed    = vpsCost + storageCost + domainCost;
-    const totalVariable = whisperCost + claudeCost;
-    const totalCost     = totalFixed + totalVariable;
-
-    const revenue  = clinics * price;
-    const profit   = revenue - totalCost;
-    const margin   = revenue > 0 ? (profit / revenue) * 100 : 0;
-
-    // ── Threshold message ─────────────────────────────
     let threshMsg;
-    if (clinics <= 5) {
-      threshMsg = 'Single VPS ($8.99/mo) handles all workload comfortably at this scale.';
-    } else if (clinics <= 20) {
-      threshMsg = 'Single VPS is sufficient. At 15+ clinics, add a DB connection pool (PgBouncer) — no extra cost.';
-    } else if (clinics <= 50) {
-      threshMsg = 'Add a second VPS ($8.99/mo) dedicated to the Python transcription + diarization service.';
-    } else {
-      threshMsg = 'Load balancer + dedicated DB server recommended. Add ~$20/mo for managed Postgres or a separate VPS.';
-    }
+    if      (clinics <= 5)  threshMsg = 'Single VPS ($8.99/mo) handles all workload comfortably.';
+    else if (clinics <= 20) threshMsg = 'Single VPS sufficient. Consider PgBouncer at 15+ clinics.';
+    else if (clinics <= 50) threshMsg = 'Add a second VPS ($8.99/mo) for the transcription service.';
+    else                    threshMsg = 'Load balancer + dedicated DB server recommended (~$20/mo extra).';
 
-    // ── Render desktop output ─────────────────────────
-    document.getElementById('out-total').textContent    = fmt(totalCost);
-    document.getElementById('out-total-2').textContent  = fmt(totalCost);
-    document.getElementById('out-vps').textContent      = fmt(vpsCost);
-    document.getElementById('out-storage').textContent  = fmt(storageCost);
-    document.getElementById('out-whisper').textContent  = fmt(whisperCost);
-    document.getElementById('out-claude').textContent   = fmt(claudeCost);
+    document.getElementById('out-total').textContent     = fmt(totalCost);
+    document.getElementById('out-context').textContent   =
+      totalSessions.toLocaleString() + ' sessions, ' + totalAudioHrs + ' hrs audio / mo';
+    document.getElementById('out-vps').textContent       = fmt(infraCost);
+    document.getElementById('out-whisper').textContent   = fmt(whisperCost);
+    document.getElementById('out-claude').textContent    = fmt(claudeCost);
     document.getElementById('out-audio-min').textContent = totalAudioMin.toLocaleString();
-    document.getElementById('out-revenue').textContent  = fmt(revenue);
-    document.getElementById('out-profit').textContent   = fmt(profit);
-    document.getElementById('out-margin').textContent   = margin.toFixed(1) + '%';
-    document.getElementById('out-clinics-rev').textContent = clinics;
-    document.getElementById('out-price-rev').textContent   = price;
+    document.getElementById('threshold-msg').textContent   = threshMsg;
+    document.getElementById('threshold-msg-2').textContent = threshMsg;
 
-    const badge = document.getElementById('out-margin-badge');
-    badge.textContent = margin.toFixed(1) + '% gross margin';
-    badge.className = 'margin-badge' + (margin > 0 ? ' positive' : '');
-
-    document.getElementById('threshold-msg').textContent = threshMsg;
-
-    // ── Render sticky bar (mobile) ────────────────────
-    document.getElementById('sb-cost').textContent    = fmt(totalCost);
-    document.getElementById('sb-revenue').textContent = fmt(revenue);
-    document.getElementById('sb-margin').textContent  = margin.toFixed(1) + '%';
-    document.getElementById('sb-infra').textContent   = fmt(totalFixed);
-    document.getElementById('sb-whisper').textContent = fmt(whisperCost);
-    document.getElementById('sb-claude').textContent  = fmt(claudeCost);
-    document.getElementById('sb-profit').textContent  = fmt(profit);
+    document.getElementById('sb-cost').textContent     = fmt(totalCost);
+    document.getElementById('sb-sessions').textContent = totalSessions.toLocaleString();
+    document.getElementById('sb-audio').textContent    = totalAudioHrs + 'h';
+    document.getElementById('sb-infra').textContent    = fmt(infraCost);
+    document.getElementById('sb-whisper').textContent  = fmt(whisperCost);
+    document.getElementById('sb-claude').textContent   = fmt(claudeCost);
   }
 
   function toggleDetail() {
@@ -586,21 +528,20 @@
     const toggle = document.getElementById('detail-toggle');
     const isOpen = detail.classList.contains('open');
     detail.classList.toggle('open', !isOpen);
-    toggle.textContent = isOpen ? 'Show cost breakdown ↓' : 'Hide cost breakdown ↑';
+    toggle.textContent = isOpen ? 'Show breakdown' : 'Hide breakdown';
   }
 
   function toggleStickyDetail() {
-    const detail  = document.getElementById('sticky-detail');
-    const toggle  = document.getElementById('sticky-toggle');
-    const isOpen  = detail.classList.contains('open');
+    const detail = document.getElementById('sticky-detail');
+    const toggle = document.getElementById('sticky-toggle');
+    const isOpen = detail.classList.contains('open');
     detail.classList.toggle('open', !isOpen);
-    toggle.textContent = isOpen ? '▲  View breakdown' : '▼  Hide breakdown';
+    toggle.textContent = isOpen ? 'View breakdown' : 'Hide breakdown';
   }
 
   slClinics.addEventListener('input',  update);
   slSessions.addEventListener('input', update);
   slMinutes.addEventListener('input',  update);
-  slPrice.addEventListener('input',    update);
 
   update();
 </script>

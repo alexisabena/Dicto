@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dicto — Business Model</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .page-hero { padding: 56px 0 40px; }
+    .page-hero h1 {
+      font-family: var(--serif);
+      font-size: clamp(26px, 4vw, 44px);
+      font-weight: 300;
+      letter-spacing: -0.01em;
+      line-height: 1.1;
+      margin-bottom: 12px;
+    }
+    .page-hero h1 em { font-style: italic; color: var(--muted); }
+    .page-hero p {
+      font-family: var(--sans);
+      font-size: 15px;
+      color: var(--muted);
+      max-width: 480px;
+      line-height: 1.7;
+    }
+    .note-band {
+      border: 1px solid var(--border);
+      background: #fafafa;
+      padding: 20px 28px;
+      margin-bottom: 40px;
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+    }
+    .note-icon {
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--faint);
+      white-space: nowrap;
+      padding-top: 2px;
+    }
+    .note-text {
+      font-family: var(--sans);
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.65;
+    }
+
+    /* Three headline metrics */
+    .headline-metrics {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      border: 1px solid var(--border);
+      margin-bottom: 0;
+    }
+    .hm {
+      padding: 32px 28px;
+      border-right: 1px solid var(--border);
+    }
+    .hm:last-child { border-right: none; }
+    .hm-val {
+      font-family: var(--serif);
+      font-size: 48px;
+      font-weight: 300;
+      letter-spacing: -0.03em;
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+    .hm-val.green { color: #1a5c1a; }
+    .hm-label {
+      font-family: var(--sans);
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    /* Cost strip below metrics */
+    .cost-strip {
+      border: 1px solid var(--border);
+      border-top: none;
+      padding: 18px 28px;
+      display: flex;
+      gap: 48px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .cost-item {
+      font-family: var(--sans);
+      font-size: 13px;
+      color: var(--muted);
+    }
+    .cost-item span {
+      font-family: var(--mono);
+      color: var(--text);
+    }
+
+    /* Estimator layout */
+    .estimator-section { padding: 0 0 80px; }
+
+    /* Slider */
+    .out-detail-toggle {
+      font-family: var(--sans);
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--muted);
+      cursor: pointer;
+      user-select: none;
+      transition: color 0.15s;
+      margin-top: 20px;
+      display: inline-block;
+    }
+    .out-detail-toggle:hover { color: var(--text); }
+    .out-detail {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.25s ease;
+    }
+    .out-detail.open { max-height: 300px; margin-top: 12px; }
+
+    .volume-table-section { padding: 64px 0; border-top: 1px solid var(--border); }
+    .volume-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      border: 1px solid var(--border);
+    }
+    .volume-table th {
+      font-family: var(--sans);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-align: left;
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border);
+      background: #fafafa;
+    }
+    .volume-table td {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border);
+      border-right: 1px solid var(--border);
+      font-family: var(--mono);
+      font-size: 13px;
+    }
+    .volume-table td:last-child { border-right: none; }
+    .volume-table tr:last-child td { border-bottom: none; }
+    .volume-table tr.highlight td { background: #fafafa; }
+    .vol-green { color: #1a5c1a; }
+    .vol-gray  { color: var(--muted); }
+
+    @media (max-width: 768px) {
+      .headline-metrics { grid-template-columns: 1fr; }
+      .hm { border-right: none; border-bottom: 1px solid var(--border); }
+      .hm:last-child { border-bottom: none; }
+      .cost-strip { gap: 24px; }
+      .volume-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+      .volume-table { min-width: 540px; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo">Dicto</a>
+    <ul class="nav-links">
+      <li><a href="index.html">Product</a></li>
+      <li><a href="pricing.html">Pricing</a></li>
+      <li><a href="roadmap.html">Roadmap</a></li>
+      <li><a href="mailto:alexisfy@gmail.com" class="nav-cta">Contact</a></li>
+    </ul>
+  </div>
+</nav>
+
+<div class="page-hero">
+  <div class="container">
+    <div class="section-label">Business model · internal view</div>
+    <h1>Revenue, cost,<br><em>and margin.</em></h1>
+    <p>
+      This page is shared selectively. It shows the full picture:
+      what Dicto charges, what it costs to run, and the margin at every scale.
+    </p>
+  </div>
+</div>
+
+<section class="estimator-section">
+  <div class="container">
+
+    <div class="note-band">
+      <div class="note-icon">Note</div>
+      <div class="note-text">
+        Pricing is <strong>$50–80/mo per clinic</strong> at MVP. The default below is $65.
+        These numbers are honest — there is no padding in the cost model and no surprise markup.
+        Margin improves with scale because the fixed infrastructure cost amortizes across more clinics.
+      </div>
+    </div>
+
+    <!-- Live metrics -->
+    <div class="headline-metrics">
+      <div class="hm">
+        <div class="hm-val" id="out-revenue">$–</div>
+        <div class="hm-label">Monthly revenue</div>
+      </div>
+      <div class="hm">
+        <div class="hm-val green" id="out-margin">–%</div>
+        <div class="hm-label">Gross margin</div>
+      </div>
+      <div class="hm">
+        <div class="hm-val" id="out-profit">$–</div>
+        <div class="hm-label">Monthly profit</div>
+      </div>
+    </div>
+    <div class="cost-strip">
+      <div class="cost-item">Operating cost <span id="out-total">$–</span> / mo</div>
+      <div class="cost-item"><span id="out-sessions">–</span> sessions</div>
+      <div class="cost-item"><span id="out-audio">–</span> hrs audio</div>
+    </div>
+
+    <!-- Sliders -->
+    <div class="estimator-wrap" style="margin-top: 32px;">
+      <div class="estimator-inputs">
+        <div class="section-label" style="margin-bottom: 28px;">Parameters</div>
+
+        <div class="slider-group">
+          <div class="slider-header">
+            <span class="slider-label">Clinics / Doctors</span>
+            <span class="slider-value" id="val-clinics">5</span>
+          </div>
+          <input type="range" id="sl-clinics" min="1" max="100" value="5" step="1">
+          <div style="display:flex;justify-content:space-between;margin-top:6px;">
+            <span style="font-family:var(--mono);font-size:10px;color:var(--faint);">1</span>
+            <span style="font-family:var(--mono);font-size:10px;color:var(--faint);">100</span>
+          </div>
+        </div>
+
+        <div class="slider-group">
+          <div class="slider-header">
+            <span class="slider-label">Sessions / clinic / month</span>
+            <span class="slider-value" id="val-sessions">20</span>
+          </div>
+          <input type="range" id="sl-sessions" min="5" max="200" value="20" step="5">
+          <div style="display:flex;justify-content:space-between;margin-top:6px;">
+            <span style="font-family:var(--mono);font-size:10px;color:var(--faint);">5</span>
+            <span style="font-family:var(--mono);font-size:10px;color:var(--faint);">200</span>
+          </div>
+        </div>
+
+        <div class="slider-group">
+          <div class="slider-header">
+            <span class="slider-label">Avg. session length (min)</span>
+            <span class="slider-value" id="val-minutes">30</span>
+          </div>
+          <input type="range" id="sl-minutes" min="5" max="90" value="30" step="5">
+          <div style="display:flex;justify-content:space-between;margin-top:6px;">
+            <span style="font-family:var(--mono);font-size:10px;color:var(--faint);">5 min</span>
+            <span style="font-family:var(--mono);font-size:10px;color:var(--faint);">90 min</span>
+          </div>
+        </div>
+
+        <div class="slider-group">
+          <div class="slider-header">
+            <span class="slider-label">Price per clinic / month</span>
+            <span class="slider-value">$<span id="val-price">65</span></span>
+          </div>
+          <input type="range" id="sl-price" min="40" max="120" value="65" step="5">
+          <div style="display:flex;justify-content:space-between;margin-top:6px;">
+            <span style="font-family:var(--mono);font-size:10px;color:var(--faint);">$40</span>
+            <span style="font-family:var(--mono);font-size:10px;color:var(--faint);">$120</span>
+          </div>
+        </div>
+
+        <div class="threshold-box">
+          <div class="threshold-label">Infrastructure note</div>
+          <div class="threshold-msg" id="threshold-msg">Single VPS handles all workload at this scale.</div>
+        </div>
+      </div>
+
+      <div class="estimator-output">
+        <div class="section-label" style="margin-bottom: 20px;">Cost breakdown</div>
+
+        <div class="output-row">
+          <span class="label">Infrastructure (VPS + storage)</span>
+          <span class="val" id="out-infra">–</span>
+        </div>
+        <div class="output-row">
+          <span class="label">Whisper API (<span id="out-audio-min">–</span> min audio)</span>
+          <span class="val" id="out-whisper">–</span>
+        </div>
+        <div class="output-row">
+          <span class="label">Claude Haiku (field extraction)</span>
+          <span class="val" id="out-claude">–</span>
+        </div>
+        <div class="output-row">
+          <span class="label">Domain + misc</span>
+          <span class="val">$0.83</span>
+        </div>
+        <div class="output-row total" style="margin-top: 8px; padding-top: 16px; border-top: 1px solid var(--border);">
+          <span class="label">Total operating cost</span>
+          <span class="val" id="out-total-b">–</span>
+        </div>
+        <div class="output-row revenue" style="margin-top: 4px;">
+          <span class="label">Revenue (<span id="out-clinics-n">–</span> × $<span id="out-price-n">65</span>)</span>
+          <span class="val" id="out-revenue-b">–</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- Volume table -->
+<section class="volume-table-section">
+  <div class="container">
+    <div class="section-label">Scale model</div>
+    <h2 class="section-title">Margin by <em>number of clinics</em></h2>
+    <p style="font-family:var(--sans);font-size:14px;color:var(--muted);margin-bottom:32px;max-width:560px;">
+      20 sessions/clinic/mo · 30-min avg · $65/clinic/mo. Infrastructure steps up at 20 and 50 clinics.
+    </p>
+    <div class="volume-table-wrap">
+    <table class="volume-table">
+      <thead>
+        <tr>
+          <th>Clinics</th>
+          <th>Cost / mo</th>
+          <th>Revenue</th>
+          <th>Profit</th>
+          <th>Margin</th>
+          <th>Infrastructure</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>1</td><td>$23.97</td>
+          <td class="vol-green">$65</td><td class="vol-green">$41.03</td>
+          <td class="vol-green">63%</td><td class="vol-gray">Single VPS</td>
+        </tr>
+        <tr class="highlight">
+          <td>5</td><td>$51.80</td>
+          <td class="vol-green">$325</td><td class="vol-green">$273.20</td>
+          <td class="vol-green">84%</td><td class="vol-gray">Single VPS</td>
+        </tr>
+        <tr>
+          <td>10</td><td>$89.60</td>
+          <td class="vol-green">$650</td><td class="vol-green">$560.40</td>
+          <td class="vol-green">86%</td><td class="vol-gray">Single VPS</td>
+        </tr>
+        <tr class="highlight">
+          <td>20</td><td>$165.20</td>
+          <td class="vol-green">$1,300</td><td class="vol-green">$1,134.80</td>
+          <td class="vol-green">87%</td><td class="vol-gray">Single VPS (at limit)</td>
+        </tr>
+        <tr>
+          <td>25</td><td>$207.00</td>
+          <td class="vol-green">$1,625</td><td class="vol-green">$1,418.00</td>
+          <td class="vol-green">87%</td><td class="vol-gray">+ Transcription VPS</td>
+        </tr>
+        <tr class="highlight">
+          <td>50</td><td>$396.00</td>
+          <td class="vol-green">$3,250</td><td class="vol-green">$2,854.00</td>
+          <td class="vol-green">88%</td><td class="vol-gray">+ Transcription VPS</td>
+        </tr>
+        <tr>
+          <td>100</td><td>$810.00</td>
+          <td class="vol-green">$6,500</td><td class="vol-green">$5,690.00</td>
+          <td class="vol-green">88%</td><td class="vol-gray">Load balancer + DB</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-left">© 2026 Dicto · Internal view — not indexed</div>
+    <ul class="footer-links">
+      <li><a href="index.html">Product</a></li>
+      <li><a href="pricing.html">Public pricing</a></li>
+      <li><a href="roadmap.html">Roadmap</a></li>
+    </ul>
+  </div>
+</footer>
+
+<script>
+  const slClinics  = document.getElementById('sl-clinics');
+  const slSessions = document.getElementById('sl-sessions');
+  const slMinutes  = document.getElementById('sl-minutes');
+  const slPrice    = document.getElementById('sl-price');
+
+  function fmt(n) {
+    return '$' + n.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  }
+
+  function update() {
+    const clinics  = parseInt(slClinics.value);
+    const sessions = parseInt(slSessions.value);
+    const minutes  = parseInt(slMinutes.value);
+    const price    = parseInt(slPrice.value);
+
+    document.getElementById('val-clinics').textContent  = clinics;
+    document.getElementById('val-sessions').textContent = sessions;
+    document.getElementById('val-minutes').textContent  = minutes;
+    document.getElementById('val-price').textContent    = price;
+
+    const totalSessions = clinics * sessions;
+    const totalAudioMin = totalSessions * minutes;
+    const totalAudioHrs = (totalAudioMin / 60).toFixed(1);
+
+    let vpsCost = 8.99;
+    if (clinics > 50)      vpsCost = 37.97;
+    else if (clinics > 20) vpsCost = 17.98;
+
+    const audioStorageMB = totalSessions * (minutes / 30) * 20;
+    const totalStorageGB = (audioStorageMB + totalSessions * 0.1) / 1024;
+    const storageCost    = Math.max(3.99, Math.ceil(totalStorageGB / 100) * 3.99);
+    const infraCost      = vpsCost + storageCost;
+    const whisperCost    = totalAudioMin * 0.006;
+    const claudeCost     = totalSessions * (3000 / 1000000) * 0.80
+                         + totalSessions * (500  / 1000000) * 4.00;
+    const totalCost      = infraCost + whisperCost + claudeCost + 0.83;
+    const revenue        = clinics * price;
+    const profit         = revenue - totalCost;
+    const margin         = revenue > 0 ? (profit / revenue) * 100 : 0;
+
+    let threshMsg;
+    if      (clinics <= 5)  threshMsg = 'Single VPS ($8.99/mo) handles all workload comfortably.';
+    else if (clinics <= 20) threshMsg = 'Single VPS sufficient. Consider PgBouncer at 15+ clinics.';
+    else if (clinics <= 50) threshMsg = 'Add a second VPS ($8.99/mo) for the transcription service.';
+    else                    threshMsg = 'Load balancer + dedicated DB server recommended (~$20/mo extra).';
+
+    document.getElementById('out-revenue').textContent  = fmt(revenue);
+    document.getElementById('out-margin').textContent   = margin.toFixed(1) + '%';
+    document.getElementById('out-profit').textContent   = fmt(profit);
+    document.getElementById('out-total').textContent    = fmt(totalCost);
+    document.getElementById('out-sessions').textContent = totalSessions.toLocaleString();
+    document.getElementById('out-audio').textContent    = totalAudioHrs;
+    document.getElementById('out-infra').textContent    = fmt(infraCost);
+    document.getElementById('out-whisper').textContent  = fmt(whisperCost);
+    document.getElementById('out-claude').textContent   = fmt(claudeCost);
+    document.getElementById('out-audio-min').textContent = totalAudioMin.toLocaleString();
+    document.getElementById('out-total-b').textContent  = fmt(totalCost);
+    document.getElementById('out-revenue-b').textContent = fmt(revenue);
+    document.getElementById('out-clinics-n').textContent = clinics;
+    document.getElementById('out-price-n').textContent   = price;
+    document.getElementById('threshold-msg').textContent = threshMsg;
+  }
+
+  slClinics.addEventListener('input',  update);
+  slSessions.addEventListener('input', update);
+  slMinutes.addEventListener('input',  update);
+  slPrice.addEventListener('input',    update);
+
+  update();
+</script>
+</body>
+</html>
