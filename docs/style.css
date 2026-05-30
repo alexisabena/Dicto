@@ -538,22 +538,180 @@ input[type="range"]::-moz-range-thumb {
 }
 .task-list li.done { color: var(--faint); text-decoration: line-through; }
 
+/* ── STICKY ESTIMATE BAR (pricing, mobile) ───────────── */
+.sticky-estimate-bar {
+  display: none; /* desktop: hidden */
+}
+
 /* ── RESPONSIVE ──────────────────────────────────────── */
+
+/* Prevent any element from causing horizontal scroll */
+html { overflow-x: hidden; }
+body { overflow-x: hidden; }
+
 @media (max-width: 768px) {
-  :root { --pad: 20px; }
+  :root { --pad: 16px; }
+
+  /* Nav — keep logo + CTA only, drop middle links */
+  .nav-links li { display: none; }
+  .nav-links li:last-child { display: flex; align-items: center; }
+
+  /* Hero */
+  .hero { padding: 56px 0 48px; }
+  .hero-meta { flex-direction: column; gap: 8px; align-items: flex-start; }
+  .hero-meta span::before { display: none; }
+
+  /* Feature grid — single column */
   .feature-grid { grid-template-columns: 1fr; }
-  .feature-card { border-right: none !important; }
-  .feature-card:nth-last-child(-n+3) { border-bottom: 1px solid var(--border) !important; }
+  .feature-card {
+    border-right: none !important;
+    border-bottom: 1px solid var(--border) !important;
+  }
   .feature-card:last-child { border-bottom: none !important; }
+
+  /* Steps */
   .steps { grid-template-columns: 1fr; gap: 32px; }
+
+  /* Tech strip — 2-col wrap */
+  .tech-strip { flex-wrap: wrap; }
+  .tech-item {
+    flex: 0 0 50%;
+    border-bottom: 1px solid var(--border);
+  }
+  .tech-item:nth-child(2n) { border-right: none; }
+  .tech-item:nth-last-child(-n+2) { border-bottom: none; }
+
+  /* Stat row — 2 columns */
   .stat-row { grid-template-columns: repeat(2, 1fr); }
   .stat:nth-child(2) { border-right: none; }
   .stat:nth-child(3) { border-right: 1px solid var(--border); }
-  .cta-band { flex-direction: column; }
-  .cta-form { flex-direction: column; }
-  .cta-input { width: 100%; border-right: 1px solid var(--border); border-bottom: none; }
-  .estimator-wrap { grid-template-columns: 1fr; }
-  .estimator-inputs { border-right: none; border-bottom: 1px solid var(--border); }
+  .stat:nth-child(3),
+  .stat:nth-child(4) { border-top: 1px solid var(--border); }
+
+  /* CTA band */
+  .cta-band { flex-direction: column; padding: 32px 24px; }
+  .cta-form { flex-direction: column; width: 100%; }
+  .cta-input {
+    width: 100%;
+    border-right: 1px solid var(--border);
+    border-bottom: none;
+  }
+  .cta-input + .btn-primary { display: block; text-align: center; }
+
+  /* Footer */
+  .footer-inner { flex-direction: column; gap: 16px; text-align: center; }
+
+  /* ── Pricing page ── */
+
+  /* Hide desktop output panel; show sticky bar instead */
+  .estimator-output { display: none; }
+  .estimator-wrap {
+    grid-template-columns: 1fr;
+    border: none;
+  }
+  .estimator-inputs {
+    border: 1px solid var(--border);
+    border-right: 1px solid var(--border);
+    padding: 24px 20px;
+    /* Room for sticky bar at bottom */
+    padding-bottom: 140px;
+  }
+
+  /* Sticky estimate bar */
+  .sticky-estimate-bar {
+    display: block;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--bg);
+    border-top: 1px solid var(--text);
+    z-index: 200;
+    box-shadow: 0 -4px 24px rgba(0,0,0,0.06);
+  }
+  .sticky-bar-summary {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    padding: 12px 16px 10px;
+    gap: 0;
+  }
+  .sticky-bar-item { text-align: center; }
+  .sticky-bar-item + .sticky-bar-item {
+    border-left: 1px solid var(--border);
+  }
+  .sticky-bar-val {
+    font-family: var(--mono);
+    font-size: 18px;
+    font-weight: 400;
+    color: var(--text);
+    line-height: 1.1;
+    margin-bottom: 3px;
+  }
+  .sticky-bar-val.positive { color: #2d6a2d; }
+  .sticky-bar-label {
+    font-family: var(--mono);
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+  }
+  .sticky-bar-toggle {
+    display: block;
+    width: 100%;
+    text-align: center;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding: 8px 16px;
+    background: none;
+    border: none;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+  }
+  .sticky-bar-detail {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.28s ease;
+    background: #fafafa;
+    border-bottom: 1px solid var(--border);
+  }
+  .sticky-bar-detail.open { max-height: 280px; }
+  .sticky-detail-inner { padding: 16px 20px; }
+  .sticky-detail-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .sticky-detail-row:last-child { border-bottom: none; }
+  .sticky-detail-row span:last-child {
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--text);
+  }
+
+  /* Assumptions grid — single column */
+  .assumptions-grid { grid-template-columns: 1fr; }
+  .assumption { border-right: none !important; }
+  .assumption { border-bottom: 1px solid var(--border) !important; }
+  .assumption:last-child { border-bottom: none !important; }
+
+  /* Volume table — horizontal scroll container */
+  .volume-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .volume-table { min-width: 560px; }
+
+  /* ── Roadmap page ── */
   .phase { grid-template-columns: 1fr; }
   .phase-meta { border-right: none; border-bottom: 1px solid var(--border); }
+  .principle-grid { grid-template-columns: 1fr; }
+  .principle { border-right: none !important; border-bottom: 1px solid var(--border) !important; }
+  .principle:last-child { border-bottom: none !important; }
+
+  /* Slider groups — tighter on mobile */
+  .slider-group { margin-bottom: 28px; }
 }

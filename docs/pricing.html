@@ -289,6 +289,7 @@
       Assumes 20 consultations per clinic per month, 30-minute average sessions, $65/mo per clinic.
       Infrastructure costs step up at specific thresholds — not linearly.
     </p>
+    <div class="volume-table-wrap">
     <table class="volume-table">
       <thead>
         <tr>
@@ -367,6 +368,7 @@
         </tr>
       </tbody>
     </table>
+    </div><!-- /volume-table-wrap -->
   </div>
 </section>
 
@@ -409,6 +411,45 @@
     </div>
   </div>
 </section>
+
+<!-- ── STICKY ESTIMATE BAR (mobile only) ─────────────── -->
+<div class="sticky-estimate-bar" id="sticky-bar">
+  <button class="sticky-bar-toggle" id="sticky-toggle" onclick="toggleStickyDetail()">▲ &nbsp;View breakdown</button>
+  <div class="sticky-bar-detail" id="sticky-detail">
+    <div class="sticky-detail-inner">
+      <div class="sticky-detail-row">
+        <span>Infrastructure</span>
+        <span id="sb-infra">$–</span>
+      </div>
+      <div class="sticky-detail-row">
+        <span>Whisper API</span>
+        <span id="sb-whisper">$–</span>
+      </div>
+      <div class="sticky-detail-row">
+        <span>Claude Haiku</span>
+        <span id="sb-claude">$–</span>
+      </div>
+      <div class="sticky-detail-row">
+        <span>Profit</span>
+        <span id="sb-profit">$–</span>
+      </div>
+    </div>
+  </div>
+  <div class="sticky-bar-summary">
+    <div class="sticky-bar-item">
+      <div class="sticky-bar-val" id="sb-cost">$–</div>
+      <div class="sticky-bar-label">Cost / mo</div>
+    </div>
+    <div class="sticky-bar-item">
+      <div class="sticky-bar-val" id="sb-revenue">$–</div>
+      <div class="sticky-bar-label">Revenue</div>
+    </div>
+    <div class="sticky-bar-item">
+      <div class="sticky-bar-val positive" id="sb-margin">–%</div>
+      <div class="sticky-bar-label">Margin</div>
+    </div>
+  </div>
+</div>
 
 <footer>
   <div class="footer-inner">
@@ -490,7 +531,7 @@
       threshMsg = 'Load balancer + dedicated DB server recommended. Add ~$20/mo for managed Postgres or a separate VPS.';
     }
 
-    // ── Render ────────────────────────────────────────
+    // ── Render desktop output ─────────────────────────
     document.getElementById('out-total').textContent    = fmt(totalCost);
     document.getElementById('out-total-2').textContent  = fmt(totalCost);
     document.getElementById('out-vps').textContent      = fmt(vpsCost);
@@ -509,6 +550,23 @@
     badge.className = 'margin-badge' + (margin > 0 ? ' positive' : '');
 
     document.getElementById('threshold-msg').textContent = threshMsg;
+
+    // ── Render sticky bar (mobile) ────────────────────
+    document.getElementById('sb-cost').textContent    = fmt(totalCost);
+    document.getElementById('sb-revenue').textContent = fmt(revenue);
+    document.getElementById('sb-margin').textContent  = margin.toFixed(1) + '%';
+    document.getElementById('sb-infra').textContent   = fmt(totalFixed);
+    document.getElementById('sb-whisper').textContent = fmt(whisperCost);
+    document.getElementById('sb-claude').textContent  = fmt(claudeCost);
+    document.getElementById('sb-profit').textContent  = fmt(profit);
+  }
+
+  function toggleStickyDetail() {
+    const detail  = document.getElementById('sticky-detail');
+    const toggle  = document.getElementById('sticky-toggle');
+    const isOpen  = detail.classList.contains('open');
+    detail.classList.toggle('open', !isOpen);
+    toggle.textContent = isOpen ? '▲  View breakdown' : '▼  Hide breakdown';
   }
 
   slClinics.addEventListener('input',  update);
