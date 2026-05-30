@@ -9,61 +9,87 @@
   <style>
     .page-hero { padding: 64px 0 48px; }
     .page-hero h1 {
-      font-family: var(--mono);
-      font-size: clamp(24px, 4vw, 40px);
-      font-weight: 400;
-      letter-spacing: -0.02em;
-      line-height: 1.15;
+      font-family: var(--serif);
+      font-size: clamp(28px, 4.5vw, 48px);
+      font-weight: 300;
+      letter-spacing: -0.01em;
+      line-height: 1.1;
       margin-bottom: 16px;
     }
     .page-hero h1 em { font-style: italic; color: var(--muted); }
     .page-hero p {
-      font-size: 15px;
+      font-family: var(--sans);
+      font-size: 16px;
       color: var(--muted);
-      max-width: 520px;
-      line-height: 1.65;
+      max-width: 500px;
+      line-height: 1.7;
     }
     .estimator-section { padding: 0 0 80px; }
-    .output-header {
-      font-family: var(--mono);
-      font-size: 10px;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--faint);
-      margin-bottom: 24px;
-    }
-    .big-total {
-      font-family: var(--mono);
-      font-size: 48px;
-      font-weight: 300;
-      letter-spacing: -0.03em;
-      line-height: 1;
-      margin-bottom: 4px;
-    }
-    .big-total-label {
-      font-family: var(--mono);
-      font-size: 11px;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--muted);
-      margin-bottom: 32px;
-    }
-    .margin-badge {
-      display: inline-block;
-      font-family: var(--mono);
-      font-size: 12px;
-      letter-spacing: 0.06em;
-      padding: 6px 12px;
+
+    /* Simplified output panel */
+    .out-metric-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0;
       border: 1px solid var(--border);
+      margin-bottom: 20px;
+    }
+    .out-metric {
+      padding: 24px 20px;
+      border-right: 1px solid var(--border);
+      text-align: center;
+    }
+    .out-metric:last-child { border-right: none; }
+    .out-metric-val {
+      font-family: var(--serif);
+      font-size: 32px;
+      font-weight: 300;
+      letter-spacing: -0.02em;
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+    .out-metric-val.accent { color: #1a5c1a; }
+    .out-metric-label {
+      font-family: var(--sans);
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
       color: var(--muted);
-      margin-bottom: 32px;
     }
-    .margin-badge.positive { border-color: #2d6a2d; color: #2d6a2d; }
-    .output-divider {
-      border: none;
-      border-top: 1px solid var(--border);
-      margin: 24px 0;
+    .out-cost-line {
+      font-family: var(--sans);
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 16px;
     }
+    .out-cost-line span {
+      font-family: var(--mono);
+      font-size: 13px;
+      color: var(--text);
+    }
+    .out-detail-toggle {
+      font-family: var(--sans);
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--muted);
+      cursor: pointer;
+      user-select: none;
+      margin-bottom: 0;
+      transition: color 0.15s;
+    }
+    .out-detail-toggle:hover { color: var(--text); }
+    .out-detail {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.25s ease;
+      margin-top: 0;
+    }
+    .out-detail.open {
+      max-height: 300px;
+      margin-top: 12px;
+    }
+
     .volume-table-section { padding: 64px 0; border-top: 1px solid var(--border); }
     .volume-table {
       width: 100%;
@@ -72,15 +98,15 @@
       border: 1px solid var(--border);
     }
     .volume-table th {
-      font-family: var(--mono);
-      font-size: 10px;
-      letter-spacing: 0.1em;
+      font-family: var(--sans);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
       text-transform: uppercase;
       color: var(--muted);
       text-align: left;
       padding: 14px 16px;
       border-bottom: 1px solid var(--border);
-      font-weight: 400;
       background: #fafafa;
     }
     .volume-table td {
@@ -92,8 +118,8 @@
     }
     .volume-table td:last-child { border-right: none; }
     .volume-table tr:last-child td { border-bottom: none; }
-    .volume-table tr.highlight td { background: #f7f7f7; }
-    .vol-green { color: #2d6a2d; }
+    .volume-table tr.highlight td { background: #fafafa; }
+    .vol-green { color: #1a5c1a; }
     .vol-gray { color: var(--muted); }
     .assumptions-section { padding: 48px 0; border-top: 1px solid var(--border); }
     .assumptions-grid {
@@ -102,17 +128,15 @@
       gap: 0;
       border: 1px solid var(--border);
     }
-    .assumption {
-      padding: 24px;
-      border-right: 1px solid var(--border);
-    }
+    .assumption { padding: 24px; border-right: 1px solid var(--border); }
     .assumption:last-child { border-right: none; }
     .assumption-key {
-      font-family: var(--mono);
-      font-size: 10px;
-      letter-spacing: 0.1em;
+      font-family: var(--sans);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
       text-transform: uppercase;
-      color: var(--faint);
+      color: var(--muted);
       margin-bottom: 8px;
     }
     .assumption-val {
@@ -121,7 +145,7 @@
       color: var(--text);
       margin-bottom: 4px;
     }
-    .assumption-note { font-size: 12px; color: var(--muted); }
+    .assumption-note { font-family: var(--sans); font-size: 12px; color: var(--muted); line-height: 1.55; }
   </style>
 </head>
 <body>
@@ -215,66 +239,62 @@
 
       <!-- OUTPUT -->
       <div class="estimator-output">
-        <div class="output-header">Monthly estimate</div>
 
-        <div class="big-total" id="out-total">$–</div>
-        <div class="big-total-label">Total operating cost / month</div>
-
-        <div class="margin-badge positive" id="out-margin-badge">–% margin</div>
-
-        <table class="breakdown-table">
-          <thead>
-            <tr>
-              <th>Line item</th>
-              <th style="text-align:right;">Cost</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>VPS (Hostinger KVM)</td>
-              <td id="out-vps">–</td>
-            </tr>
-            <tr>
-              <td>Object storage</td>
-              <td id="out-storage">–</td>
-            </tr>
-            <tr>
-              <td>Domain (amortized)</td>
-              <td>$0.83</td>
-            </tr>
-            <tr>
-              <td>Whisper API (<span id="out-audio-min">–</span> min audio)</td>
-              <td id="out-whisper">–</td>
-            </tr>
-            <tr>
-              <td>Claude Haiku (field extraction)</td>
-              <td id="out-claude">–</td>
-            </tr>
-            <tr>
-              <td>WhatsApp Cloud API</td>
-              <td>$0.00</td>
-            </tr>
-          </tbody>
-        </table>
-
-        <hr class="output-divider">
-
-        <div class="output-row total">
-          <span class="label">Total cost</span>
-          <span class="val" id="out-total-2">$–</span>
+        <div class="out-metric-grid">
+          <div class="out-metric">
+            <div class="out-metric-val" id="out-revenue">$–</div>
+            <div class="out-metric-label">Monthly revenue</div>
+          </div>
+          <div class="out-metric">
+            <div class="out-metric-val accent" id="out-margin">–%</div>
+            <div class="out-metric-label">Gross margin</div>
+          </div>
+          <div class="out-metric">
+            <div class="out-metric-val" id="out-profit">$–</div>
+            <div class="out-metric-label">Monthly profit</div>
+          </div>
         </div>
-        <div class="output-row revenue">
-          <span class="label">Revenue (<span id="out-clinics-rev">–</span> clinics × $<span id="out-price-rev">65</span>)</span>
-          <span class="val" id="out-revenue">$–</span>
+
+        <div class="out-cost-line">
+          Platform costs <span id="out-total">$–</span> / month to operate
         </div>
-        <div class="output-row margin">
-          <span class="label">Gross margin</span>
-          <span class="val" id="out-margin">–%</span>
+
+        <div class="out-detail-toggle" id="detail-toggle" onclick="toggleDetail()">
+          Show cost breakdown ↓
         </div>
-        <div class="output-row">
-          <span class="label">Monthly profit</span>
-          <span class="val" id="out-profit">$–</span>
+        <div class="out-detail" id="out-detail">
+          <div class="output-row">
+            <span class="label">Infrastructure</span>
+            <span class="val" id="out-vps">–</span>
+          </div>
+          <div class="output-row">
+            <span class="label">Object storage</span>
+            <span class="val" id="out-storage">–</span>
+          </div>
+          <div class="output-row">
+            <span class="label">Whisper API (<span id="out-audio-min">–</span> min)</span>
+            <span class="val" id="out-whisper">–</span>
+          </div>
+          <div class="output-row">
+            <span class="label">Claude Haiku</span>
+            <span class="val" id="out-claude">–</span>
+          </div>
+          <div class="output-row">
+            <span class="label">Domain + misc</span>
+            <span class="val">$0.83</span>
+          </div>
         </div>
+
+        <div class="threshold-box" style="margin-top: 24px;">
+          <div class="threshold-label">Infrastructure note</div>
+          <div class="threshold-msg" id="threshold-msg">Single VPS handles all workload at this scale.</div>
+        </div>
+
+        <!-- hidden ids kept for JS compatibility -->
+        <span id="out-total-2" style="display:none"></span>
+        <span id="out-clinics-rev" style="display:none"></span>
+        <span id="out-price-rev" style="display:none"></span>
+        <span id="out-margin-badge" style="display:none"></span>
       </div>
     </div>
   </div>
@@ -559,6 +579,14 @@
     document.getElementById('sb-whisper').textContent = fmt(whisperCost);
     document.getElementById('sb-claude').textContent  = fmt(claudeCost);
     document.getElementById('sb-profit').textContent  = fmt(profit);
+  }
+
+  function toggleDetail() {
+    const detail = document.getElementById('out-detail');
+    const toggle = document.getElementById('detail-toggle');
+    const isOpen = detail.classList.contains('open');
+    detail.classList.toggle('open', !isOpen);
+    toggle.textContent = isOpen ? 'Show cost breakdown ↓' : 'Hide cost breakdown ↑';
   }
 
   function toggleStickyDetail() {
