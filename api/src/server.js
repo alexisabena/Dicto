@@ -9,6 +9,7 @@ import cookie from '@fastify/cookie';
 import { authPlugin } from './plugins/auth.js';
 import { transcribeRoute } from './routes/transcribe.js';
 import { sessionsRoute } from './routes/sessions.js';
+import { whatsappRoute } from './routes/whatsapp.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -27,6 +28,7 @@ await app.register(staticPlugin, {
 await app.register(authPlugin);
 await app.register(transcribeRoute, { prefix: '/api' });
 await app.register(sessionsRoute,   { prefix: '/api' });
+await app.register(whatsappRoute,   { prefix: '/api' });
 
 app.get('/health', async () => ({ ok: true }));
 
