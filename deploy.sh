@@ -31,7 +31,7 @@ fi
 
 echo "==> Installing Node dependencies"
 cd "$APP_DIR/api"
-npm ci --omit=dev
+npm install --omit=dev
 
 echo "==> Creating data directory"
 mkdir -p "$DATA_DIR/sessions"
