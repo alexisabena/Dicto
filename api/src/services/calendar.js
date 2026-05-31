@@ -10,7 +10,7 @@ const WORK_END       = parseInt(process.env.WORK_END_HOUR    || '19');  // 7 PM
 const WORK_DAYS      = (process.env.WORK_DAYS || '1,2,3,4,5')           // Mon–Fri
                          .split(',').map(Number);
 const SLOT_MIN       = parseInt(process.env.SLOT_DURATION_MIN || '60'); // appointment length
-const BUFFER_MIN     = parseInt(process.env.SLOT_BUFFER_MIN   || '16'); // gap between slots
+const BUFFER_MIN     = parseInt(process.env.SLOT_BUFFER_MIN   || '15'); // gap between slots
 const DAYS_AHEAD     = parseInt(process.env.DAYS_AHEAD        || '7');  // how far to look
 const DOCTOR_NAME    = process.env.DOCTOR_NAME || 'el médico';
 
