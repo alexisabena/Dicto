@@ -1,11 +1,12 @@
 #!/usr/bin/env bash
 # Expedicta — VPS bootstrap + deploy
-# Run once on a fresh Hostinger KVM2 (Ubuntu 24)
+# Run once on a fresh Hetzner CPX32 (Ubuntu 26.04)
 # Usage: bash deploy.sh
+# With domain: DOMAIN=expedicta.com bash deploy.sh
 
 set -euo pipefail
 
-REPO="https://github.com/alexisabena/Expedicta.git"
+REPO="https://github.com/alexisabena/expedicta.git"
 APP_DIR="/opt/expedicta"
 DATA_DIR="/var/expedicta/data"
 NODE_VERSION="20"
