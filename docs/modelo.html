@@ -410,18 +410,16 @@
     const totalAudioMin = totalSessions * minutes;
     const totalAudioHrs = (totalAudioMin / 60).toFixed(1);
 
-    // Hetzner CX32 ~$10/mo; storage on local NVMe at MVP scale
-    // Scale thresholds: >20 clinics add transcription server, >50 add DB/LB
-    let vpsCost = 10;
-    if (clinics > 50)      vpsCost = 50;   // CX32 + CX22 transcription + CX21 DB
-    else if (clinics > 20) vpsCost = 20;   // CX32 + CX22 dedicated transcription
+    // Hetzner CPX32 Nuremberg: €13.99/mo ≈ $17.49 USD
+    // 4 AMD EPYC vCPU, 8GB RAM, 160GB NVMe — handles pyannote when added
+    // Local disk sufficient up to ~20 clinics; add object storage beyond
+    let vpsCost = 17.49;
+    if      (clinics > 50) vpsCost = 17.49 + 7.99 + 7.99; // CPX32 + 2x CPX22
+    else if (clinics > 20) vpsCost = 17.49 + 7.99;         // CPX32 + CPX22 transcription
 
-    // Object storage only needed at scale (>20 clinics local disk fills up)
-    const storageCost = clinics > 20
-      ? Math.max(6, Math.ceil(totalSessions * (minutes / 30) * 20 / 1024 / 1000) * 6)
-      : 0;
-
+    const storageCost = clinics > 20 ? 7.99 : 0; // Hetzner Object Storage at scale
     const infraCost   = vpsCost + storageCost;
+
     const whisperCost = totalAudioMin * 0.006;
     const claudeCost  = totalSessions * (3000 / 1000000) * 0.80
                       + totalSessions * (500  / 1000000) * 4.00;

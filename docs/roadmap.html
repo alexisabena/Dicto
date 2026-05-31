@@ -185,6 +185,40 @@
   <div class="container">
     <div class="phase-list">
 
+      <!-- PHASE 0 — BUSINESS SETUP -->
+      <div class="phase">
+        <div class="phase-meta">
+          <div class="phase-tag">Phase 00</div>
+          <div class="phase-name">Business &amp; Commercial Setup</div>
+          <div class="phase-weeks">Parallel to Phase 1</div>
+          <div style="margin-top:12px;">
+            <span class="current-tag">In progress</span>
+          </div>
+        </div>
+        <div class="phase-body">
+          <div class="phase-deliverable">Deliverable — Legal entity + payment rails ready before first invoice</div>
+          <p>
+            Everything needed to legally collect money, deduct expenses, and eventually
+            register as a formal business in Mexico. Run this in parallel with the technical
+            foundation — none of it blocks shipping, but it must exist before the first invoice.
+          </p>
+          <ul class="task-list">
+            <li class="done">Hetzner CPX32 — server provisioned, Nuremberg</li>
+            <li>Stripe account — create at stripe.com, verify identity, add MXN bank account</li>
+            <li>RFC con actividad empresarial — register with SAT as persona física (fastest path to legal invoicing)</li>
+            <li>Régimen RESICO — simplified tax regime for small business income</li>
+            <li>expedicta.com domain — purchase via Cloudflare Registrar or Porkbun</li>
+            <li>Deductible expenses to track: Hetzner, OpenAI, Stripe fees, domain, software</li>
+            <li>SAS (Sociedad por Acciones Simplificada) — register when 2+ customers, protects personal liability</li>
+            <li>SA de CV — upgrade path when seeking investment or hiring</li>
+          </ul>
+          <div class="phase-deliverable-box">
+            <div class="phase-deliverable-box-label">Success criterion</div>
+            <p>Can issue a legal CFDI (factura electrónica) to the first customer. Stripe can receive card payments and deposit to a Mexican bank account.</p>
+          </div>
+        </div>
+      </div>
+
       <!-- PHASE 1 -->
       <div class="phase">
         <div class="phase-meta">
@@ -196,24 +230,23 @@
           </div>
         </div>
         <div class="phase-body">
-          <div class="phase-deliverable">Deliverable — Server live, patient records creatable via API</div>
+          <div class="phase-deliverable">Deliverable — Server live, recorder working, first transcript saved</div>
           <p>
-            Everything that everything else depends on. VPS provisioned, Nginx serving HTTPS,
-            Postgres running, patient records writable via API, audio files uploadable to object storage.
-            No UI yet — just a solid foundation.
+            Everything the product runs on. Hetzner VPS provisioned, Nginx serving HTTPS,
+            Node.js API live, web recorder UI accessible, audio uploaded and transcribed
+            via Whisper. One doctor can record a session and read the transcript.
           </p>
           <ul class="task-list">
-            <li>Hostinger VPS provisioning — Ubuntu 24, Nginx, Certbot, SSL</li>
-            <li>Node.js 20 + Python 3.12 + PostgreSQL 16 installed</li>
-            <li>Monorepo scaffold — <code>/api</code>, <code>/web</code>, <code>/transcription</code>, <code>/site</code></li>
-            <li>Drizzle ORM schema + migration runner</li>
-            <li>Patient folder structure + Markdown file generator</li>
-            <li>JWT auth — single doctor login (bcrypt + JWT)</li>
-            <li>Object storage bucket + chunked upload endpoint</li>
+            <li class="done">Hetzner CPX32 — Ubuntu 26.04, SSH access</li>
+            <li>Run deploy.sh — Node.js, Nginx, Certbot, SSL, systemd service</li>
+            <li>Point expedicta.com DNS A record to server IP</li>
+            <li>Add OPENAI_API_KEY to /opt/expedicta/api/.env</li>
+            <li>Test recorder → upload → Whisper → transcript flow end to end</li>
+            <li>Verify transcript saves to /var/expedicta/data/sessions/</li>
           </ul>
           <div class="phase-deliverable-box">
             <div class="phase-deliverable-box-label">Success criterion</div>
-            <p>curl -X POST /patients creates a patient record. curl -X POST /audio uploads a .webm chunk. Both persist across server restarts.</p>
+            <p>Doctor opens expedicta.com, records a 2-minute voice note, receives a timestamped Spanish transcript within 60 seconds.</p>
           </div>
         </div>
       </div>
