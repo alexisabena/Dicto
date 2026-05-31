@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>Expedicta</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500&family=Noto+Sans+Mono:wght@400;500&family=Noto+Serif:wght@300;400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg:     #ffffff;
+      --text:   #000000;
+      --muted:  #555555;
+      --faint:  #999999;
+      --border: #e0e0e0;
+      --red:    #c0392b;
+      --sans:   'Noto Sans', system-ui, sans-serif;
+      --serif:  'Noto Serif', Georgia, serif;
+      --mono:   'Noto Sans Mono', monospace;
+    }
+    html, body {
+      height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      -webkit-font-smoothing: antialiased;
+    }
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 24px;
+    }
+    .logo {
+      font-family: var(--sans);
+      font-weight: 700;
+      font-size: 13px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text);
+      margin-bottom: 48px;
+    }
+    .card {
+      width: 100%;
+      max-width: 320px;
+      border: 1px solid var(--border);
+      padding: 40px 32px 36px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .label {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--faint);
+      margin-bottom: 20px;
+    }
+    .pin-input {
+      width: 100%;
+      text-align: center;
+      font-family: var(--serif);
+      font-size: 32px;
+      font-weight: 300;
+      letter-spacing: 0.2em;
+      border: none;
+      border-bottom: 2px solid var(--text);
+      padding: 8px 0 12px;
+      background: transparent;
+      color: var(--text);
+      outline: none;
+      -webkit-text-security: disc;
+    }
+    .pin-input::placeholder {
+      color: var(--border);
+      letter-spacing: 0.3em;
+    }
+    .pin-input.error { border-bottom-color: var(--red); }
+    .submit-btn {
+      margin-top: 32px;
+      width: 100%;
+      font-family: var(--sans);
+      font-size: 13px;
+      font-weight: 500;
+      padding: 13px;
+      border: 1px solid var(--text);
+      background: var(--text);
+      color: var(--bg);
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+      letter-spacing: 0.02em;
+    }
+    .submit-btn:hover { background: var(--bg); color: var(--text); }
+    .submit-btn:disabled { opacity: 0.4; cursor: default; }
+    .error-msg {
+      margin-top: 16px;
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 0.06em;
+      color: var(--red);
+      text-transform: uppercase;
+      min-height: 16px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="logo">Expedicta</div>
+
+<div class="card">
+  <div class="label">Enter access PIN</div>
+  <input
+    class="pin-input"
+    id="pin"
+    type="password"
+    inputmode="numeric"
+    autocomplete="off"
+    placeholder="••••••"
+    maxlength="10"
+    autofocus
+  >
+  <button class="submit-btn" id="btn">Enter</button>
+  <div class="error-msg" id="err"></div>
+</div>
+
+<script>
+  const pinEl = document.getElementById('pin');
+  const btn   = document.getElementById('btn');
+  const err   = document.getElementById('err');
+
+  async function submit() {
+    const pin = pinEl.value.trim();
+    if (!pin) return;
+
+    btn.disabled = true;
+    err.textContent = '';
+    pinEl.classList.remove('error');
+
+    try {
+      const res = await fetch('/api/auth/login', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({ pin }),
+      });
+
+      if (res.ok) {
+        window.location.href = '/';
+      } else {
+        pinEl.value = '';
+        pinEl.classList.add('error');
+        err.textContent = 'Incorrect PIN';
+        pinEl.focus();
+      }
+    } catch {
+      err.textContent = 'Connection error — try again';
+    } finally {
+      btn.disabled = false;
+    }
+  }
+
+  btn.addEventListener('click', submit);
+  pinEl.addEventListener('keydown', e => { if (e.key === 'Enter') submit(); });
+</script>
+</body>
+</html>
