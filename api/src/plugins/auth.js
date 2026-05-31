@@ -1,4 +1,5 @@
 import { createHmac } from 'crypto';
+import fp from 'fastify-plugin';
 
 const COOKIE_NAME = 'exp_session';
 const COOKIE_DAYS = 30;
@@ -7,7 +8,7 @@ function makeToken(secret) {
   return createHmac('sha256', secret).update('authenticated').digest('hex');
 }
 
-export async function authPlugin(app) {
+export const authPlugin = fp(async function auth(app) {
   const pin    = process.env.ACCESS_PIN;
   const secret = process.env.COOKIE_SECRET;
 
@@ -39,14 +40,15 @@ export async function authPlugin(app) {
     return reply.redirect('/login.html');
   });
 
-  // ── Auth guard — fires on every request ─────────────
+  // ── Auth guard — fp() hoists this to root scope ──────
+  // Fires for ALL requests including static files
   app.addHook('onRequest', async (req, reply) => {
     const path = req.url.split('?')[0];
 
     const isPublic =
-      path === '/health'            ||
-      path === '/login.html'        ||
-      path === '/api/auth/login'    ||
+      path === '/health'         ||
+      path === '/login.html'     ||
+      path === '/api/auth/login' ||
       path === '/api/auth/logout';
 
     if (isPublic) return;
@@ -54,12 +56,9 @@ export async function authPlugin(app) {
     const token = req.cookies?.[COOKIE_NAME];
     if (token === validToken) return;
 
-    // API call without auth → 401 JSON
     if (path.startsWith('/api/')) {
       return reply.code(401).send({ error: 'Unauthorized' });
     }
-
-    // Page request without auth → redirect to login
     return reply.redirect('/login.html');
   });
-}
+});
