@@ -46,10 +46,11 @@ export const authPlugin = fp(async function auth(app) {
     const path = req.url.split('?')[0];
 
     const isPublic =
-      path === '/health'         ||
-      path === '/login.html'     ||
-      path === '/api/auth/login' ||
-      path === '/api/auth/logout';
+      path === '/health'                  ||
+      path === '/login.html'              ||
+      path === '/api/auth/login'          ||
+      path === '/api/auth/logout'         ||
+      path === '/api/whatsapp/webhook';   // Kapso calls this — verified by HMAC instead
 
     if (isPublic) return;
 

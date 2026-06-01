@@ -11,9 +11,10 @@ const STEP_TIMEOUT_MS = 15 * 60 * 1000; // 15 min idle resets the conversation
 
 // ── Appointment types ────────────────────────────────
 const APPT_TYPES = [
-  { key: '1', label: 'Primera consulta',  duration: 60 },
-  { key: '2', label: 'Seguimiento',       duration: 30 },
-  { key: '3', label: 'Procedimiento',     duration: 90 },
+  { key: '1', label: 'Primera vez',  duration: 60 },
+  { key: '2', label: 'Seguimiento',  duration: 60 },
+  { key: '3', label: 'Procedimiento', duration: 60 },
+  { key: '4', label: 'Urgencia',     duration: 60 },
 ];
 
 // ── Main entry point ──────────────────────────────────
