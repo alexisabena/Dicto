@@ -15,6 +15,13 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const app = Fastify({ logger: true });
 
+// Store raw body buffer so the WhatsApp webhook can verify Kapso's HMAC signature.
+app.addContentTypeParser('application/json', { parseAs: 'buffer' }, (req, body, done) => {
+  req.rawBody = body;
+  try { done(null, JSON.parse(body)); }
+  catch (err) { err.statusCode = 400; done(err); }
+});
+
 await app.register(cors, { origin: true });
 await app.register(cookie);
 await app.register(multipart, {
