@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Expedicta — Revisión del Bot de WhatsApp</title>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'DM Sans', 'Segoe UI', system-ui, sans-serif;
+      background: #fff;
+      color: #111;
+      line-height: 1.6;
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 48px 32px 80px;
+    }
+
+    /* ── Header ── */
+    .header { border-bottom: 1px solid #e5e5e5; padding-bottom: 24px; margin-bottom: 40px; }
+    .header .label {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #888;
+      margin-bottom: 8px;
+    }
+    h1 { font-size: 26px; font-weight: 600; }
+    .subtitle { color: #555; margin-top: 6px; font-size: 15px; }
+
+    /* ── Sections ── */
+    section { margin-bottom: 56px; }
+    h2 {
+      font-size: 16px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #888;
+      margin-bottom: 20px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid #e5e5e5;
+    }
+    h3 { font-size: 15px; font-weight: 600; margin: 24px 0 8px; }
+
+    /* ── Decision tree ── */
+    .mermaid { background: #fafafa; border: 1px solid #e5e5e5; border-radius: 8px; padding: 24px; overflow-x: auto; }
+
+    /* ── Zones ── */
+    .zones { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px; }
+    .zone {
+      border: 1px solid #e5e5e5;
+      border-radius: 8px;
+      padding: 16px 20px;
+    }
+    .zone-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .dot { width: 8px; height: 8px; border-radius: 50%; }
+    .dot-red { background: #e53e3e; }
+    .dot-green { background: #38a169; }
+    .dot-blue { background: #3182ce; }
+    .zone ul { padding-left: 16px; font-size: 13.5px; color: #333; }
+    .zone ul li { margin-bottom: 4px; }
+
+    /* ── Tone examples ── */
+    .example-group { margin-bottom: 28px; }
+    .example-group p { font-size: 14px; color: #444; margin-bottom: 12px; }
+    .bubble-row { display: flex; flex-direction: column; gap: 8px; }
+    .bubble {
+      border-radius: 12px;
+      padding: 12px 16px;
+      font-size: 14px;
+      line-height: 1.5;
+      max-width: 88%;
+      position: relative;
+    }
+    .bubble .tag {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 6px;
+      display: block;
+    }
+    .bubble.good  { background: #f0faf4; border: 1px solid #b7e4c7; }
+    .bubble.bad   { background: #fff5f5; border: 1px solid #feb2b2; }
+    .bubble.patient { background: #f0f4ff; border: 1px solid #c3d2f5; align-self: flex-end; }
+    .bubble.good .tag  { color: #276749; }
+    .bubble.bad .tag   { color: #9b2c2c; }
+    .bubble.patient .tag { color: #2b4acb; }
+    .scenario-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: #555;
+      margin-bottom: 10px;
+      padding: 4px 10px;
+      background: #f5f5f5;
+      border-radius: 4px;
+      display: inline-block;
+    }
+
+    /* ── Rules list ── */
+    .rules { list-style: none; padding: 0; }
+    .rules li {
+      padding: 12px 16px;
+      border-bottom: 1px solid #f0f0f0;
+      font-size: 14px;
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+    }
+    .rules li:last-child { border-bottom: none; }
+    .rule-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+    .rule-text strong { display: block; font-weight: 600; margin-bottom: 2px; }
+    .rule-text span { color: #555; font-size: 13px; }
+
+    /* ── Footer ── */
+    .footer {
+      margin-top: 64px;
+      padding-top: 24px;
+      border-top: 1px solid #e5e5e5;
+      font-size: 12px;
+      color: #999;
+      font-family: 'DM Mono', monospace;
+    }
+
+    @media print {
+      body { padding: 24px; }
+      .mermaid { break-inside: avoid; }
+      section { break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <div class="label">Expedicta · Documento de revisión · Junio 2026</div>
+  <h1>Bot de WhatsApp — Dr. Mario León</h1>
+  <p class="subtitle">Árbol de decisión, tono de comunicación y ejemplos de conversación</p>
+</div>
+
+<!-- ── SCOPE ── -->
+<section>
+  <h2>Alcance del bot</h2>
+  <div class="zones">
+    <div class="zone">
+      <div class="zone-label"><div class="dot dot-green"></div> El bot sí hace</div>
+      <ul>
+        <li>Recibir y procesar solicitudes de cita</li>
+        <li>Consultar horarios disponibles en tiempo real</li>
+        <li>Registrar la cita en el calendario del Dr. León</li>
+        <li>Enviar confirmación con dirección y Maps</li>
+        <li>Dar información de ubicación y facturación</li>
+        <li>Manejar respuestas fuera de flujo con firmeza</li>
+      </ul>
+    </div>
+    <div class="zone">
+      <div class="zone-label"><div class="dot dot-red"></div> El bot NO hace</div>
+      <ul>
+        <li>Interpretar síntomas o dar orientación médica</li>
+        <li>Procesar imágenes, documentos o audios</li>
+        <li>Dar descuentos o condiciones especiales</li>
+        <li>Dar trato preferencial a familiares o conocidos</li>
+        <li>Gestionar cancelaciones o cambios de cita</li>
+        <li>Responder preguntas sobre diagnósticos o tratamientos</li>
+      </ul>
+    </div>
+  </div>
+  <div class="zones" style="margin-top:12px;">
+    <div class="zone" style="grid-column: span 2;">
+      <div class="zone-label"><div class="dot dot-blue"></div> Escalación automática al grupo del doctor</div>
+      <ul>
+        <li>Cualquier mensaje con descripción de síntoma o solicitud de consejo médico</li>
+        <li>Cualquier mensaje multimedia (foto, video, documento, audio)</li>
+        <li>El paciente recibe un mensaje de redirección; el doctor recibe un resumen discreto en el grupo profesional</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ── DECISION TREE ── -->
+<section>
+  <h2>Árbol de decisión</h2>
+  <div class="mermaid">
+flowchart TD
+    A([📱 Mensaje entrante]) --> B{¿Es multimedia?\nfoto · video · audio · doc}
+
+    B -->|Sí| ESC1[🚨 Escalación\nRedirige al paciente\nNotifica al grupo del doctor]
+    B -->|No — es texto| C{¿Contiene síntomas\no contenido médico?}
+
+    C -->|Sí| ESC2[🚨 Escalación\nRedirige al paciente\nNotifica al grupo del doctor]
+    C -->|No| D{¿Es saludo nuevo\no sesión expirada?}
+
+    D -->|Sí| MENU[Menú de tipos de cita\n1️⃣ Primera vez\n2️⃣ Seguimiento\n3️⃣ Procedimiento\n4️⃣ Urgencia]
+    D -->|No| CONT[Continúa el paso actual]
+
+    MENU --> T{¿Elige 1, 2, 3 o 4?}
+    T -->|Opción válida| NAME[Solicita nombre completo]
+    T -->|Inválido| MENU
+
+    NAME --> SLOTS[Consulta Google Calendar\nMuestra hasta 6 horarios]
+    SLOTS --> SL{¿Elige un número?}
+    SL -->|Válido| CONF[Muestra resumen\nPide confirmación sí / no]
+    SL -->|Inválido| SLOTS
+
+    CONF --> CV{¿Confirma?}
+    CV -->|Sí ✅| BOOK[Registra en Google Calendar\nEnvía confirmación con Maps]
+    CV -->|No| SLOTS
+
+    style ESC1 fill:#fff0f0,stroke:#e53e3e
+    style ESC2 fill:#fff0f0,stroke:#e53e3e
+    style BOOK fill:#f0faf4,stroke:#38a169
+    style MENU fill:#f7f7f7,stroke:#aaa
+  </div>
+</section>
+
+<!-- ── TONE PRINCIPLES ── -->
+<section>
+  <h2>Principios de tono</h2>
+  <ul class="rules">
+    <li>
+      <span class="rule-icon">🎯</span>
+      <div class="rule-text">
+        <strong>Cálido pero eficiente</strong>
+        <span>Como una recepcionista experimentada: amable, directa, sin rodeos. No es una conversación de café — el paciente quiere agendar y seguir con su día.</span>
+      </div>
+    </li>
+    <li>
+      <span class="rule-icon">⚖️</span>
+      <div class="rule-text">
+        <strong>Igual para todos</strong>
+        <span>Mismo proceso, sin excepción. Si alguien menciona ser familiar o amigo del doctor, se responde con calidez que el proceso es el mismo para todos.</span>
+      </div>
+    </li>
+    <li>
+      <span class="rule-icon">🩺</span>
+      <div class="rule-text">
+        <strong>Sin opinión clínica, nunca</strong>
+        <span>Si el paciente describe síntomas, el bot no evalúa si es grave o leve. Solo redirige con calma. El doctor es el único que puede opinar sobre salud.</span>
+      </div>
+    </li>
+    <li>
+      <span class="rule-icon">🧱</span>
+      <div class="rule-text">
+        <strong>Firme bajo presión</strong>
+        <span>Ante insistencia, quejas o agresividad: el tono no cambia, el proceso no cambia. Se puede ofrecer que el doctor los contacte directamente.</span>
+      </div>
+    </li>
+    <li>
+      <span class="rule-icon">📏</span>
+      <div class="rule-text">
+        <strong>Respuestas cortas</strong>
+        <span>Máximo un párrafo. Esto es WhatsApp — los mensajes largos no se leen completos y generan desconfianza.</span>
+      </div>
+    </li>
+  </ul>
+</section>
+
+<!-- ── EXAMPLES ── -->
+<section>
+  <h2>Ejemplos de conversación</h2>
+
+  <!-- 1. Happy path -->
+  <div class="example-group">
+    <h3>1. Flujo de agendamiento normal</h3>
+    <p>El paciente llega sin contexto, completa el flujo sin fricciones.</p>
+    <div class="bubble-row">
+      <div class="bubble patient"><span class="tag">Paciente</span>Hola buenas tardes</div>
+      <div class="bubble good"><span class="tag">✅ Bot</span>Hola 👋 Bienvenido al consultorio del <strong>Dr. Mario León</strong>.<br><br>¿Qué tipo de cita necesitas?<br><br>1️⃣ Primera vez<br>2️⃣ Seguimiento<br>3️⃣ Procedimiento<br>4️⃣ Urgencia</div>
+      <div class="bubble patient"><span class="tag">Paciente</span>1</div>
+      <div class="bubble good"><span class="tag">✅ Bot</span>¿Cuál es el nombre completo del paciente?</div>
+      <div class="bubble patient"><span class="tag">Paciente</span>Rosa María Herrera</div>
+      <div class="bubble good"><span class="tag">✅ Bot</span>Horarios disponibles para <strong>Rosa María Herrera</strong>:<br><br>1. lun 8 jun, 9:00 AM<br>2. lun 8 jun, 11:00 AM<br>3. mar 9 jun, 8:00 AM<br>4. mar 9 jun, 2:00 PM<br><br>¿Cuál prefieres?</div>
+      <div class="bubble patient"><span class="tag">Paciente</span>El 3</div>
+      <div class="bubble good"><span class="tag">✅ Bot</span>Confirma tu cita:<br><br>📅 mar 9 jun, 8:00 AM<br>👨‍⚕️ Dr. Mario León<br>📋 Primera vez<br>📍 Blvd. Luis Sánchez Pontón 616, Col. Anzures, Puebla<br><br>¿Confirmamos? Responde <strong>sí</strong> o <strong>no</strong></div>
+      <div class="bubble patient"><span class="tag">Paciente</span>Sí</div>
+      <div class="bubble good"><span class="tag">✅ Bot</span>✅ <strong>Cita confirmada</strong><br><br>📅 mar 9 jun, 8:00 AM<br>👨‍⚕️ Dr. Mario León<br>📋 Primera vez<br>📍 Blvd. Luis Sánchez Pontón 616, Col. Anzures, Puebla<br>🗺️ https://maps.app.goo.gl/Yqhb6rgZ3E3XRUhf8<br><br>Te recordaremos 24h antes. ¡Hasta pronto, Rosa María! 👋</div>
+    </div>
+  </div>
+
+  <!-- 2. Medical content -->
+  <div class="example-group">
+    <h3>2. Paciente describe un síntoma</h3>
+    <p>El bot no evalúa la gravedad. Redirige con calidez y sin alarmar.</p>
+    <div class="bubble-row">
+      <div class="bubble patient"><span class="tag">Paciente</span>Hola, es que al manejar pasé por un tope y de repente dejé de ver bien del lado derecho</div>
+      <div class="bubble good"><span class="tag">✅ Bot — correcto</span>Gracias por escribirnos. Para consultas médicas o síntomas necesitas hablar directamente con el Dr. León — este canal es solo para agendar citas. 📅<br><br>Si deseas programar una cita, con gusto te ayudo.</div>
+      <div class="bubble bad"><span class="tag">❌ Bot — evitar</span>¡Oh! Eso suena muy preocupante, podría ser una urgencia oftalmológica seria. Te recomiendo que lo tratemos como urgencia para que el Dr. León te vea lo antes posible hoy mismo...</div>
+    </div>
+  </div>
+
+  <!-- 3. Location -->
+  <div class="example-group">
+    <h3>3. Paciente pregunta la dirección</h3>
+    <p>Se da la información una vez, con claridad. No se acompaña al paciente paso a paso.</p>
+    <div class="bubble-row">
+      <div class="bubble patient"><span class="tag">Paciente</span>¿Dónde están ubicados?</div>
+      <div class="bubble good"><span class="tag">✅ Bot</span>📍 Blvd. Lic. Luis Sánchez Pontón 616, Col. Anzures, 72530 Puebla.<br>🗺️ https://maps.app.goo.gl/Yqhb6rgZ3E3XRUhf8</div>
+      <div class="bubble patient"><span class="tag">Paciente</span>Pero no lo encuentro, ¿pueden salir a buscarme?</div>
+      <div class="bubble good"><span class="tag">✅ Bot — firme, sin ceder</span>Esa es toda la información de ubicación que tenemos disponible. El link de Google Maps te guiará directamente al consultorio. 🗺️</div>
+      <div class="bubble bad"><span class="tag">❌ Bot — evitar</span>¡Claro! No se preocupe. ¿En qué calle está ahorita? Permítame preguntarle al doctor si puede salir un momento a indicarle el camino...</div>
+    </div>
+  </div>
+
+  <!-- 4. Favoritism -->
+  <div class="example-group">
+    <h3>4. Paciente pide trato especial</h3>
+    <p>El proceso es el mismo para todos. Se responde con calidez, sin disculpas excesivas.</p>
+    <div class="bubble-row">
+      <div class="bubble patient"><span class="tag">Paciente</span>Soy cuñado del doctor, ¿me puede dar una cita hoy a la hora que sea?</div>
+      <div class="bubble good"><span class="tag">✅ Bot</span>Con mucho gusto te ayudo. El proceso de agendamiento es el mismo para todos — veamos qué horarios tenemos disponibles. ¿Qué tipo de cita necesitas?</div>
+      <div class="bubble bad"><span class="tag">❌ Bot — evitar</span>¡Oh, claro que sí! Déjeme ver qué puedo hacer para usted, en un momento lo comunico con el doctor para que le indique...</div>
+    </div>
+  </div>
+
+  <!-- 5. Rude patient -->
+  <div class="example-group">
+    <h3>5. Paciente molesto o agresivo</h3>
+    <p>Se reconoce la emoción. No se cede, no se debate, no se imita el tono.</p>
+    <div class="bubble-row">
+      <div class="bubble patient"><span class="tag">Paciente</span>Llevan dos semanas sin atenderme bien, exijo que me den cita hoy y sin cobro</div>
+      <div class="bubble good"><span class="tag">✅ Bot</span>Entiendo tu frustración y lo siento. Lo que puedo hacer desde aquí es ayudarte a agendar la próxima cita disponible. Si quieres que el doctor te contacte directamente, puedes indicármelo.<br><br>¿Continuamos con el agendamiento?</div>
+      <div class="bubble bad"><span class="tag">❌ Bot — evitar</span>Tiene usted toda la razón, disculpe mucho las molestias. Voy a ver cómo le hacemos para que no pague hoy...</div>
+    </div>
+  </div>
+
+  <!-- 6. Invoicing -->
+  <div class="example-group">
+    <h3>6. Paciente pide factura</h3>
+    <p>Siempre al canal oficial — va directo al contador del doctor.</p>
+    <div class="bubble-row">
+      <div class="bubble patient"><span class="tag">Paciente</span>¿Cómo puedo pedir mi factura?</div>
+      <div class="bubble good"><span class="tag">✅ Bot</span>Las facturas se gestionan desde aquí: 🧾 https://www.drmarioleonretina.com/facturacion<br><br>¿Hay algo más en lo que pueda ayudarte?</div>
+    </div>
+  </div>
+
+</section>
+
+<!-- ── PENDING ── -->
+<section>
+  <h2>Pendiente para activar</h2>
+  <ul class="rules">
+    <li>
+      <span class="rule-icon">💬</span>
+      <div class="rule-text">
+        <strong>Grupo de escalación</strong>
+        <span>Mario crea un grupo de WhatsApp con su teléfono personal + profesional. El bot publica ahí un resumen discreto cuando escala un caso. Hasta entonces, queda registrado en los logs del servidor.</span>
+      </div>
+    </li>
+    <li>
+      <span class="rule-icon">⏰</span>
+      <div class="rule-text">
+        <strong>Recordatorio 24h antes</strong>
+        <span>Mensaje automático al paciente el día previo a su cita. Requiere guardar el número del paciente al momento de agendar.</span>
+      </div>
+    </li>
+    <li>
+      <span class="rule-icon">📅</span>
+      <div class="rule-text">
+        <strong>Sincronización con Doctoralia</strong>
+        <span>Si Mario activa la integración Google Calendar en Doctoralia, sus citas de esa plataforma bloquean automáticamente los horarios — sin código adicional.</span>
+      </div>
+    </li>
+  </ul>
+</section>
+
+<div class="footer">
+  Expedicta · Documento de revisión interna · Generado el 1 de junio de 2026<br>
+  Para uso del Dr. Mario León y el equipo de desarrollo. No compartir con pacientes.
+</div>
+
+<script>
+  mermaid.initialize({
+    startOnLoad: true,
+    theme: 'base',
+    themeVariables: {
+      primaryColor: '#f7f7f7',
+      primaryTextColor: '#111',
+      primaryBorderColor: '#aaa',
+      lineColor: '#666',
+      secondaryColor: '#f0faf4',
+      tertiaryColor: '#fff0f0',
+      fontSize: '14px'
+    },
+    flowchart: { curve: 'basis', padding: 20 }
+  });
+</script>
+</body>
+</html>
