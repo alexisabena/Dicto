@@ -25,7 +25,7 @@ async function sendReply(to, text) {
   await kapso.messages.sendText({
     phoneNumberId: PHONE_NUMBER_ID,
     to: `+${to}`,
-    text: { body: text },
+    body: text,
   });
 }
 
