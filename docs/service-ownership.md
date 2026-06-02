@@ -26,14 +26,20 @@
 ## Plan de transferencia por servicio
 
 ### 1. Anthropic API — `ANTHROPIC_API_KEY`
-**Dificultad:** 🟢 Fácil (10 min)
-1. Mario crea cuenta en [console.anthropic.com](https://console.anthropic.com)
-2. Agrega método de pago
-3. Genera una API key
-4. Alexis actualiza `ANTHROPIC_API_KEY` en `/opt/expedicta/api/.env` y reinicia el servicio
-5. Alexis borra la key de su cuenta
+**Titular actual:** Alexis Abena (`alexisfy@gmail.com`) — console.anthropic.com, Default workspace
+**Key name:** `expedicta-prod`
+**Créditos cargados:** $10 USD (junio 2026) — burn rate ~$3/mo, alcanza para ~3 meses
+**Dificultad de transferencia:** 🟢 Fácil (10 min)
 
-**Riesgo si no se transfiere:** Bot de WhatsApp deja de responder si Alexis no renueva créditos.
+Pasos para transferir:
+1. Mario crea cuenta en [console.anthropic.com](https://console.anthropic.com)
+2. Agrega método de pago y compra créditos
+3. Genera una API key nueva (nombre sugerido: `expedicta-prod`)
+4. Alexis actualiza `ANTHROPIC_API_KEY` en `/opt/expedicta/api/.env` y reinicia: `systemctl restart expedicta`
+5. Verificar que el bot responde en WhatsApp
+6. Alexis revoca la key `expedicta-prod` de su cuenta
+
+**Riesgo si no se transfiere:** Bot de WhatsApp deja de responder cuando se agoten los créditos de Alexis.
 
 ---
 
