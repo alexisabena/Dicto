@@ -182,7 +182,8 @@
       <ul>
         <li>Cualquier mensaje con descripción de síntoma o solicitud de consejo médico</li>
         <li>Cualquier mensaje multimedia (foto, video, documento, audio)</li>
-        <li>El paciente recibe un mensaje de redirección; el doctor recibe un resumen discreto en el grupo profesional</li>
+        <li>Paciente que selecciona opción 5 "Otro tema" y describe su caso</li>
+        <li>El paciente recibe un mensaje cálido de confirmación; el doctor recibe un resumen discreto en el grupo profesional</li>
       </ul>
     </div>
   </div>
@@ -195,18 +196,21 @@
 flowchart TD
     A([📱 Mensaje entrante]) --> B{¿Es multimedia?\nfoto · video · audio · doc}
 
-    B -->|Sí| ESC1[🚨 Escalación\nRedirige al paciente\nNotifica al grupo del doctor]
+    B -->|Sí| ESC1[🚨 Escalación\n"Le haré saber al Dr. León"\nNotifica al grupo del doctor]
     B -->|No — es texto| C{¿Contiene síntomas\no contenido médico?}
 
-    C -->|Sí| ESC2[🚨 Escalación\nRedirige al paciente\nNotifica al grupo del doctor]
+    C -->|Sí| ESC2[🚨 Escalación\n"Le haré saber al Dr. León"\nNotifica al grupo del doctor]
     C -->|No| D{¿Es saludo nuevo\no sesión expirada?}
 
-    D -->|Sí| MENU[Menú de tipos de cita\n1️⃣ Primera vez\n2️⃣ Seguimiento\n3️⃣ Procedimiento\n4️⃣ Urgencia]
+    D -->|Sí| MENU[Menú de opciones\n1️⃣ Primera vez\n2️⃣ Seguimiento\n3️⃣ Procedimiento\n4️⃣ Urgencia\n5️⃣ Otro tema]
     D -->|No| CONT[Continúa el paso actual]
 
-    MENU --> T{¿Elige 1, 2, 3 o 4?}
-    T -->|Opción válida| NAME[Solicita nombre completo]
+    MENU --> T{¿Qué elige?}
+    T -->|1 · 2 · 3 · 4| NAME[Solicita nombre completo]
+    T -->|5 — Otro tema| OTHER[¿Sobre qué tema?\nRecoge mensaje]
     T -->|Inválido| MENU
+
+    OTHER --> ESC3[🚨 Escalación\n"El Dr. León te contactará"\nNotifica al grupo del doctor]
 
     NAME --> SLOTS[Consulta Google Calendar\nMuestra hasta 6 horarios]
     SLOTS --> SL{¿Elige un número?}
@@ -219,8 +223,10 @@ flowchart TD
 
     style ESC1 fill:#fff0f0,stroke:#e53e3e
     style ESC2 fill:#fff0f0,stroke:#e53e3e
+    style ESC3 fill:#fff0f0,stroke:#e53e3e
     style BOOK fill:#f0faf4,stroke:#38a169
     style MENU fill:#f7f7f7,stroke:#aaa
+    style OTHER fill:#fffbf0,stroke:#d69e2e
   </div>
 </section>
 
@@ -276,7 +282,7 @@ flowchart TD
     <p>El paciente llega sin contexto, completa el flujo sin fricciones.</p>
     <div class="bubble-row">
       <div class="bubble patient"><span class="tag">Paciente</span>Hola buenas tardes</div>
-      <div class="bubble good"><span class="tag">✅ Bot</span>Hola 👋 Bienvenido al consultorio del <strong>Dr. Mario León</strong>.<br><br>¿Qué tipo de cita necesitas?<br><br>1️⃣ Primera vez<br>2️⃣ Seguimiento<br>3️⃣ Procedimiento<br>4️⃣ Urgencia</div>
+      <div class="bubble good"><span class="tag">✅ Bot</span>Hola 👋 Bienvenido al consultorio del <strong>Dr. Mario León</strong>.<br><br>¿En qué te puedo ayudar?<br><br>1️⃣ Primera vez<br>2️⃣ Seguimiento<br>3️⃣ Procedimiento<br>4️⃣ Urgencia<br>5️⃣ Otro tema</div>
       <div class="bubble patient"><span class="tag">Paciente</span>1</div>
       <div class="bubble good"><span class="tag">✅ Bot</span>¿Cuál es el nombre completo del paciente?</div>
       <div class="bubble patient"><span class="tag">Paciente</span>Rosa María Herrera</div>
@@ -291,24 +297,27 @@ flowchart TD
   <!-- 2. Medical content -->
   <div class="example-group">
     <h3>2. Paciente describe un síntoma</h3>
-    <p>El bot no evalúa la gravedad. Redirige con calidez y sin alarmar.</p>
+    <p>El bot no evalúa la gravedad. Reconoce la situación con calidez, referencia al doctor y ofrece agendar. El doctor recibe un resumen en el grupo.</p>
     <div class="bubble-row">
       <div class="bubble patient"><span class="tag">Paciente</span>Hola, es que al manejar pasé por un tope y de repente dejé de ver bien del lado derecho</div>
-      <div class="bubble good"><span class="tag">✅ Bot — correcto</span>Gracias por escribirnos. Para consultas médicas o síntomas necesitas hablar directamente con el Dr. León — este canal es solo para agendar citas. 📅<br><br>Si deseas programar una cita, con gusto te ayudo.</div>
-      <div class="bubble bad"><span class="tag">❌ Bot — evitar</span>¡Oh! Eso suena muy preocupante, podría ser una urgencia oftalmológica seria. Te recomiendo que lo tratemos como urgencia para que el Dr. León te vea lo antes posible hoy mismo...</div>
+      <div class="bubble good"><span class="tag">✅ Bot — correcto</span>Gracias por escribirnos. Para este tipo de consulta lo mejor es hablar directamente con el Dr. León — le haré saber para que pueda contactarte. 🩺<br><br>Si mientras tanto quieres agendar una cita, aquí te ayudo.</div>
+      <div class="bubble bad"><span class="tag">❌ Bot — evitar (alarmista)</span>¡Oh! Eso suena muy preocupante, podría ser una urgencia oftalmológica seria. Te recomiendo que lo tratemos como urgencia para que el Dr. León te vea lo antes posible hoy mismo...</div>
+      <div class="bubble bad"><span class="tag">❌ Bot — evitar (frío)</span>Este canal es únicamente para agendar citas. Para consultas médicas comunícate directamente con el consultorio.</div>
     </div>
   </div>
 
   <!-- 3. Location -->
   <div class="example-group">
-    <h3>3. Paciente pregunta la dirección</h3>
-    <p>Se da la información una vez, con claridad. No se acompaña al paciente paso a paso.</p>
+    <h3>3. Paciente no encuentra el consultorio</h3>
+    <p>Se da la información una vez. Si persiste, se ofrece que el doctor lo contacte — pero no se acompaña paso a paso ni se cede ante presión.</p>
     <div class="bubble-row">
       <div class="bubble patient"><span class="tag">Paciente</span>¿Dónde están ubicados?</div>
       <div class="bubble good"><span class="tag">✅ Bot</span>📍 Blvd. Lic. Luis Sánchez Pontón 616, Col. Anzures, 72530 Puebla.<br>🗺️ https://maps.app.goo.gl/Yqhb6rgZ3E3XRUhf8</div>
-      <div class="bubble patient"><span class="tag">Paciente</span>Pero no lo encuentro, ¿pueden salir a buscarme?</div>
-      <div class="bubble good"><span class="tag">✅ Bot — firme, sin ceder</span>Esa es toda la información de ubicación que tenemos disponible. El link de Google Maps te guiará directamente al consultorio. 🗺️</div>
-      <div class="bubble bad"><span class="tag">❌ Bot — evitar</span>¡Claro! No se preocupe. ¿En qué calle está ahorita? Permítame preguntarle al doctor si puede salir un momento a indicarle el camino...</div>
+      <div class="bubble patient"><span class="tag">Paciente</span>Pero no lo encuentro, ya estoy cerca y no doy con él</div>
+      <div class="bubble good"><span class="tag">✅ Bot — firme y cálido</span>El link de Maps te lleva directo al consultorio. Si sigues con dificultad, puedo hacer que el Dr. León te contacte para orientarte. ¿Lo hacemos? 🗺️</div>
+      <div class="bubble patient"><span class="tag">Paciente</span>Pues que salga él a buscarme, para eso cobran lo que cobran</div>
+      <div class="bubble good"><span class="tag">✅ Bot — sin ceder, sin debate</span>Entiendo. Esa es toda la información de ubicación disponible. Si deseas, con gusto agendo tu próxima cita cuando te sea más conveniente llegar.</div>
+      <div class="bubble bad"><span class="tag">❌ Bot — evitar</span>¡Claro! ¿En qué calle está ahorita? Permítame preguntarle al doctor si puede salir un momento a indicarle el camino...</div>
     </div>
   </div>
 
@@ -334,7 +343,22 @@ flowchart TD
     </div>
   </div>
 
-  <!-- 6. Invoicing -->
+  <!-- 6. Otro tema -->
+  <div class="example-group">
+    <h3>6. Paciente elige "Otro tema"</h3>
+    <p>El paciente no quiere agendar pero necesita comunicarse. La opción 5 abre un canal directo al doctor sin que el bot tenga que responder sobre algo fuera de su alcance.</p>
+    <div class="bubble-row">
+      <div class="bubble patient"><span class="tag">Paciente</span>Hola</div>
+      <div class="bubble good"><span class="tag">✅ Bot</span>Hola 👋 Bienvenido al consultorio del <strong>Dr. Mario León</strong>.<br><br>¿En qué te puedo ayudar?<br><br>1️⃣ Primera vez<br>2️⃣ Seguimiento<br>3️⃣ Procedimiento<br>4️⃣ Urgencia<br>5️⃣ Otro tema</div>
+      <div class="bubble patient"><span class="tag">Paciente</span>5</div>
+      <div class="bubble good"><span class="tag">✅ Bot</span>¿Sobre qué tema necesitas hablar? Escríbemelo brevemente y se lo haré saber al Dr. León.</div>
+      <div class="bubble patient"><span class="tag">Paciente</span>Quiero saber si el doctor atiende pacientes con diabetes que tienen problemas en la retina</div>
+      <div class="bubble good"><span class="tag">✅ Bot</span>Gracias. Le haré saber al Dr. León para que pueda contactarte directamente. 👨‍⚕️</div>
+    </div>
+    <p style="margin-top:10px; font-size:13px; color:#666;">→ El doctor recibe en el grupo: <em>"Paciente seleccionó 'Otro tema' — Quiero saber si el doctor atiende pacientes con diabetes que tienen problemas en la retina"</em></p>
+  </div>
+
+  <!-- 7. Invoicing -->
   <div class="example-group">
     <h3>6. Paciente pide factura</h3>
     <p>Siempre al canal oficial — va directo al contador del doctor.</p>

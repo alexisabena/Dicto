@@ -1,15 +1,15 @@
 /**
  * conversation.js — WhatsApp scheduling bot (state machine)
  *
- * Scope: appointment booking only.
- * Any medical content (symptoms, advice, photos) is immediately escalated
+ * Scope: appointment booking + open-ended topic routing.
+ * Medical content (symptoms, advice, photos) is immediately escalated
  * to the doctor's professional group — the bot never responds to clinical content.
+ * Option 5 "Otro tema" gives patients a clean path for anything non-scheduling.
  */
 
 import { getAvailableSlots, bookSlot, DOCTOR_NAME } from './calendar.js';
 
 // ── Session store ─────────────────────────────────────
-// In-memory, keyed by phone. Resets after 15 min idle.
 const sessions = new Map();
 const SESSION_TIMEOUT_MS = 15 * 60 * 1000;
 
@@ -19,18 +19,17 @@ const APPT_TYPES = [
   { key: '2', label: 'Seguimiento',   duration: 60 },
   { key: '3', label: 'Procedimiento', duration: 60 },
   { key: '4', label: 'Urgencia',      duration: 60 },
+  { key: '5', label: 'Otro tema',     duration: 0  },
 ];
 
 // ── Medical escalation detection ──────────────────────
-// Catches symptom descriptions, medical advice requests, and prescription content.
-// When triggered the bot redirects the patient and notifies the doctor's group.
 const MEDICAL_PATTERN = /\b(me duele|me está doliendo|dolor (de|en|ocular)|sangr[aeo]|no veo|perdí (la )?visión|visión borrosa|visión nublada|ojo rojo|ojo inflamado|hinchad[ao]|ardor|picazón|picor|lagrimeo|se me nubló|manchas en la visión|destellos|luces en la visión|golpe en el ojo|me cayó algo|me entró algo|receta médica|medicamento|medicina|pastilla|gotas para|qué tengo|qué puede ser|es grave|es normal que|debería (preocuparme|ir urgente|tomar)|alergia ocular|infección ocular|conjuntivitis|cataratas|glaucoma|desprendimiento de retina|urgencia médica|emergencia médica|me operaron y)\b/i;
 
 function isMedicalContent(text) {
   return MEDICAL_PATTERN.test(text);
 }
 
-// ── Escalation message (sent to doctor's group) ───────
+// ── Escalation abstract ───────────────────────────────
 function buildEscalationAbstract(phone, text, reason) {
   return [
     `⚠️ *Derivación automática — bot Expedicta*`,
@@ -47,29 +46,30 @@ function buildEscalationAbstract(phone, text, reason) {
 /**
  * Handle an incoming WhatsApp text message.
  * Returns { reply: string, escalation?: { abstract: string } }
- *
- * The caller (whatsapp.js) sends reply to the patient and,
- * if escalation is present, sends the abstract to ESCALATION_CHAT_ID.
  */
 export async function handleMessage(phone, text) {
   const msg = text.trim();
 
   // Hard stop — medical content
+  // Gentle redirect: acknowledge, reference the doctor, don't just dismiss.
   if (isMedicalContent(msg)) {
     return {
-      reply: `Gracias por escribirnos. Para consultas médicas, síntomas o dudas clínicas necesitas hablar directamente con el Dr. León — este canal es solo para agendar citas. 📅\n\nSi deseas programar una cita, con gusto te ayudo.`,
+      reply: [
+        `Gracias por escribirnos. Para este tipo de consulta lo mejor es hablar directamente con el Dr. León — le haré saber para que pueda contactarte. 🩺`,
+        ``,
+        `Si mientras tanto quieres agendar una cita, aquí te ayudo.`,
+      ].join('\n'),
       escalation: {
         abstract: buildEscalationAbstract(phone, msg, 'Descripción de síntoma o consulta médica'),
       },
     };
   }
 
-  // Normal booking flow
-  const reply = await runStateMachine(phone, msg);
-  return { reply };
+  return runStateMachine(phone, msg);
 }
 
 // ── Booking state machine ─────────────────────────────
+// Returns { reply: string, escalation?: { abstract: string } }
 async function runStateMachine(phone, msg) {
   let session = sessions.get(phone);
 
@@ -79,20 +79,25 @@ async function runStateMachine(phone, msg) {
 
   if (!session || isGreeting(msg)) {
     sessions.set(phone, { step: 'ask_type', data: {}, updatedAt: Date.now() });
-    return replyAskType();
+    return { reply: replyAskType() };
   }
 
   touch(phone, session);
 
+  let result;
   switch (session.step) {
-    case 'ask_type': return handleAskType(phone, session, msg);
-    case 'ask_name': return handleAskName(phone, session, msg);
-    case 'ask_slot': return handleAskSlot(phone, session, msg);
-    case 'confirm':  return handleConfirm(phone, session, msg);
+    case 'ask_type':        result = handleAskType(phone, session, msg);        break;
+    case 'ask_other_topic': result = handleAskOtherTopic(phone, session, msg);  break;
+    case 'ask_name':        result = handleAskName(phone, session, msg);        break;
+    case 'ask_slot':        result = await handleAskSlot(phone, session, msg);  break;
+    case 'confirm':         result = await handleConfirm(phone, session, msg);  break;
     default:
       sessions.delete(phone);
-      return replyAskType();
+      result = replyAskType();
   }
+
+  // Normalize: step handlers may return a plain string or a full object
+  return typeof result === 'string' ? { reply: result } : result;
 }
 
 // ── Step handlers ─────────────────────────────────────
@@ -102,10 +107,31 @@ function handleAskType(phone, session, msg) {
   if (!choice) {
     return `Por favor responde con el número de tu opción:\n\n${apptTypeList()}`;
   }
+
   session.data.type     = choice.label;
   session.data.duration = choice.duration;
-  session.step          = 'ask_name';
+
+  // Option 5 — open topic: skip booking flow, collect message
+  if (choice.key === '5') {
+    session.step = 'ask_other_topic';
+    return `¿Sobre qué tema necesitas hablar? Escríbemelo brevemente y se lo haré saber al Dr. León.`;
+  }
+
+  session.step = 'ask_name';
   return `¿Cuál es el nombre completo del paciente?`;
+}
+
+function handleAskOtherTopic(phone, session, msg) {
+  if (msg.length < 3) return `¿Puedes describirme brevemente el tema?`;
+
+  sessions.delete(phone);
+
+  return {
+    reply: `Gracias. Le haré saber al Dr. León para que pueda contactarte directamente. 👨‍⚕️`,
+    escalation: {
+      abstract: buildEscalationAbstract(phone, msg, 'Paciente seleccionó "Otro tema"'),
+    },
+  };
 }
 
 function handleAskName(phone, session, msg) {
@@ -153,9 +179,9 @@ async function handleConfirm(phone, session, msg) {
   const slot = session.data.chosenSlot;
   try {
     await bookSlot({
-      startISO:    slot.start.toISO(),
-      endISO:      slot.end.toISO(),
-      patientName: session.data.name,
+      startISO:     slot.start.toISO(),
+      endISO:       slot.end.toISO(),
+      patientName:  session.data.name,
       patientPhone: phone,
       type:         session.data.type,
     });
@@ -202,7 +228,7 @@ function replyAskType() {
   return [
     `Hola 👋 Bienvenido al consultorio del *${DOCTOR_NAME}*.`,
     ``,
-    `¿Qué tipo de cita necesitas?`,
+    `¿En qué te puedo ayudar?`,
     ``,
     apptTypeList(),
   ].join('\n');
