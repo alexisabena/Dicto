@@ -248,6 +248,23 @@ When asking Claude Code to build, reference this file with:
 
 ---
 
+## Service Ownership
+
+⚠️ All infrastructure and API services currently run under **Alexis Abena's accounts** (`alexisfy@gmail.com`) while building the MVP for Dr. Mario León.
+
+| Service | Owner | Est. cost/mo |
+|---|---|---|
+| Hostinger VPS | Alexis | $8.99 |
+| Hostinger Object Storage | Alexis | $3.99 |
+| Anthropic API (Claude Haiku) | Alexis | ~$3 |
+| OpenAI Whisper API | Alexis | ~$7 |
+| Kapso.ai (WhatsApp) | Alexis | variable |
+| Google Calendar API | Dr. Mario León | $0 |
+
+Full transfer plan (step-by-step per service): see `docs/service-ownership.md`
+
+---
+
 ## Founder Notes
 
 - Product started as a conversation about a Hermes-style agent for a doctor friend

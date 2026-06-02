@@ -1,186 +1,197 @@
+/**
+ * conversation.js — Claude Haiku-powered WhatsApp conversation engine
+ *
+ * Replaces the rigid state machine with Haiku as the brain.
+ * Haiku handles free-form Spanish, edge cases, and tool calls
+ * (get_available_slots, book_appointment) to interact with Google Calendar.
+ */
+
+import Anthropic from '@anthropic-ai/sdk';
 import { getAvailableSlots, bookSlot, DOCTOR_NAME } from './calendar.js';
 
-/**
- * In-memory conversation state per phone number.
- * In production this would be Redis or a DB table.
- * { [phone]: { step, data, slots, updatedAt } }
- */
+const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+
+const SESSION_TIMEOUT_MS = 15 * 60 * 1000; // 15 min idle resets conversation
+
+// In-memory sessions keyed by phone number.
+// { [phone]: { messages: Message[], updatedAt: number } }
 const sessions = new Map();
 
-const STEP_TIMEOUT_MS = 15 * 60 * 1000; // 15 min idle resets the conversation
+// ── System prompt ─────────────────────────────────────
+// Cached — it never changes per request, so we mark it ephemeral
+// to hit Anthropic's prompt cache on repeated calls.
+const SYSTEM = `Eres el asistente virtual del consultorio del Dr. Mario León, oftalmólogo en Puebla, México.
+Tu función principal es agendar citas para los pacientes.
 
-// ── Appointment types ────────────────────────────────
-const APPT_TYPES = [
-  { key: '1', label: 'Primera vez',  duration: 60 },
-  { key: '2', label: 'Seguimiento',  duration: 60 },
-  { key: '3', label: 'Procedimiento', duration: 60 },
-  { key: '4', label: 'Urgencia',     duration: 60 },
+INFORMACIÓN DEL CONSULTORIO
+Médico: Dr. Mario León (oftalmólogo)
+Dirección: Blvd. Lic. Luis Sánchez Pontón 616, Col. Anzures, 72530 Heroica Puebla de Zaragoza, Pue., México
+Google Maps: https://maps.app.goo.gl/Yqhb6rgZ3E3XRUhf8
+Horario: Lunes a viernes 8:00–12:00 y 13:00–19:00 | Sábados 8:00–12:00
+(El horario puede variar por cirugías — los horarios disponibles los consultas en tiempo real)
+
+TIPOS DE CITA (todas 60 minutos)
+- Primera vez: primer contacto con el Dr. León
+- Seguimiento: revisión de paciente ya atendido
+- Procedimiento: intervención o tratamiento programado
+- Urgencia: problema ocular urgente
+
+FLUJO PARA AGENDAR
+1. Saluda con calidez si es el primer mensaje
+2. Si el paciente no indicó el tipo de cita, pregúntalo
+3. Pide el nombre completo del paciente
+4. Usa get_available_slots para consultar horarios disponibles
+5. Presenta máximo 5 opciones de forma clara y amigable
+6. Cuando el paciente elija y confirme, usa book_appointment
+
+MANEJO DE SITUACIONES ESPECIALES
+- Dirección / cómo llegar: comparte la dirección completa y el link de Google Maps
+- Paciente molesto o frustrado: responde con empatía, ofrece ayuda concreta, no te pongas a la defensiva
+- Paciente grosero: mantén la calma, sé amable, no respondas el tono
+- Urgencias: consulta slots disponibles hoy; si no hay, indica "Para urgencias inmediatas comunícate directamente con el consultorio"
+- Preguntas médicas (diagnósticos, síntomas, tratamientos): no respondas, redirige al Dr. León
+- Preguntas que no puedes resolver: "Para más información comunícate directamente con el consultorio"
+- Cancelaciones o cambios de cita: disculpate, indica que por el momento los cambios se gestionan llamando al consultorio directamente
+
+ESTILO DE COMUNICACIÓN
+- Siempre en español
+- Cálido, profesional y breve — esto es WhatsApp, no un correo
+- Usa emojis con moderación (👍 ✅ 📅 están bien, no abuses)
+- No inventes información que no tengas`;
+
+// ── Tool definitions ──────────────────────────────────
+const TOOLS = [
+  {
+    name: 'get_available_slots',
+    description: 'Consulta los horarios disponibles para agendar una cita. Úsalo cuando el paciente quiera agendar o ver opciones de horario.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        appointment_type: {
+          type: 'string',
+          enum: ['Primera vez', 'Seguimiento', 'Procedimiento', 'Urgencia'],
+          description: 'Tipo de cita solicitada',
+        },
+      },
+      required: ['appointment_type'],
+    },
+  },
+  {
+    name: 'book_appointment',
+    description: 'Registra la cita en el calendario del Dr. León. Úsalo solo después de que el paciente haya confirmado explícitamente el horario.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        start_iso:        { type: 'string', description: 'Fecha y hora de inicio (ISO 8601)' },
+        end_iso:          { type: 'string', description: 'Fecha y hora de fin (ISO 8601)' },
+        patient_name:     { type: 'string', description: 'Nombre completo del paciente' },
+        appointment_type: { type: 'string', description: 'Tipo de cita' },
+        slot_label:       { type: 'string', description: 'Etiqueta legible del horario, ej: "lun 2 jun, 10:00 AM"' },
+      },
+      required: ['start_iso', 'end_iso', 'patient_name', 'appointment_type'],
+    },
+  },
 ];
 
 // ── Main entry point ──────────────────────────────────
 /**
  * Handle an incoming WhatsApp message.
- * Returns the reply string to send back.
+ * Returns the reply string to send back to the patient.
  */
 export async function handleMessage(phone, text) {
-  const msg = text.trim();
-
   let session = sessions.get(phone);
 
   // Reset stale sessions
-  if (session && Date.now() - session.updatedAt > STEP_TIMEOUT_MS) {
+  if (session && Date.now() - session.updatedAt > SESSION_TIMEOUT_MS) {
     session = null;
   }
-
-  // Greeting keywords start a new booking flow
-  if (!session || isGreeting(msg)) {
-    sessions.set(phone, { step: 'ask_type', data: {}, updatedAt: Date.now() });
-    return replyAskType();
+  if (!session) {
+    session = { messages: [], updatedAt: Date.now() };
   }
 
-  touch(phone, session);
-
-  switch (session.step) {
-    case 'ask_type':    return handleAskType(phone, session, msg);
-    case 'ask_name':    return handleAskName(phone, session, msg);
-    case 'ask_slot':    return handleAskSlot(phone, session, msg);
-    case 'confirm':     return handleConfirm(phone, session, msg);
-    default:
-      sessions.delete(phone);
-      return replyAskType();
-  }
-}
-
-// ── Step handlers ─────────────────────────────────────
-
-function handleAskType(phone, session, msg) {
-  const choice = APPT_TYPES.find(t => t.key === msg);
-  if (!choice) {
-    return `Por favor responde con el número de la opción:\n${apptTypeList()}`;
-  }
-  session.data.type     = choice.label;
-  session.data.duration = choice.duration;
-  session.step = 'ask_name';
-  return `¿Cuál es tu nombre completo?`;
-}
-
-function handleAskName(phone, session, msg) {
-  if (msg.length < 2) return '¿Puedes compartirme tu nombre completo?';
-  session.data.name = capitalize(msg);
-  session.step = 'ask_slot';
-  return fetchAndShowSlots(phone, session);
-}
-
-async function handleAskSlot(phone, session, msg) {
-  const idx = parseInt(msg) - 1;
-  const slots = session.data.slots || [];
-
-  if (isNaN(idx) || idx < 0 || idx >= slots.length) {
-    return `Por favor elige un número del 1 al ${slots.length}.\n\n${slotList(slots)}`;
-  }
-
-  const chosen = slots[idx];
-  session.data.chosenSlot = chosen;
-  session.step = 'confirm';
-
-  return [
-    `Perfecto, ${session.data.name} 👍`,
-    ``,
-    `Confirma tu cita:`,
-    `📅 ${chosen.label}`,
-    `🏥 ${DOCTOR_NAME}`,
-    `📋 ${session.data.type}`,
-    ``,
-    `¿Confirmas? Responde *sí* o *no*`,
-  ].join('\n');
-}
-
-async function handleConfirm(phone, session, msg) {
-  const yes = /^(s[ií]|yes|ok|dale|va|confirmo|confirm)/i.test(msg);
-  const no  = /^(no|cancel|nope)/i.test(msg);
-
-  if (!yes && !no) {
-    return `Responde *sí* para confirmar o *no* para cancelar.`;
-  }
-
-  if (no) {
-    session.step = 'ask_slot';
-    return `Sin problema. Elige otro horario:\n\n${slotList(session.data.slots)}`;
-  }
-
-  // Book it
-  const slot = session.data.chosenSlot;
-  try {
-    await bookSlot({
-      startISO:    slot.start.toISO(),
-      endISO:      slot.end.toISO(),
-      patientName: session.data.name,
-      patientPhone: phone,
-      type:         session.data.type,
-    });
-  } catch (err) {
-    console.error('Calendar booking error:', err);
-    return `Tuvimos un problema al agendar. Por favor llama directamente a la clínica.`;
-  }
-
-  sessions.delete(phone);
-
-  return [
-    `✅ *Cita confirmada*`,
-    ``,
-    `📅 ${slot.label}`,
-    `🏥 ${DOCTOR_NAME}`,
-    `📋 ${session.data.type}`,
-    ``,
-    `Te recordaremos 24h antes. ¡Hasta pronto, ${session.data.name}! 👋`,
-  ].join('\n');
-}
-
-// ── Helpers ───────────────────────────────────────────
-
-async function fetchAndShowSlots(phone, session) {
-  let slots;
-  try {
-    slots = await getAvailableSlots(6, session.data.duration);
-  } catch (err) {
-    console.error('Calendar error:', err);
-    return `Tuvimos un problema consultando el calendario. Intenta de nuevo en unos minutos.`;
-  }
-
-  if (slots.length === 0) {
-    return `No hay horarios disponibles en los próximos días. Por favor llama directamente a la clínica.`;
-  }
-
-  session.data.slots = slots;
-  return `Hola ${session.data.name} 😊 Estos son los horarios disponibles:\n\n${slotList(slots)}\n\n¿Cuál prefieres?`;
-}
-
-function replyAskType() {
-  return [
-    `Hola 👋 Soy el asistente de ${DOCTOR_NAME}.`,
-    ``,
-    `¿Qué tipo de consulta necesitas?`,
-    apptTypeList(),
-  ].join('\n');
-}
-
-function apptTypeList() {
-  return APPT_TYPES.map(t => `${t.key}️⃣ ${t.label}`).join('\n');
-}
-
-function slotList(slots) {
-  return slots.map((s, i) => `${i + 1}. ${s.label}`).join('\n');
-}
-
-function isGreeting(msg) {
-  return /^(hola|hi|hello|buenas|buen[oa]s|quiero|quisiera|agendar|cita|consulta)/i.test(msg);
-}
-
-function capitalize(str) {
-  return str.toLowerCase().replace(/\b\w/g, c => c.toUpperCase());
-}
-
-function touch(phone, session) {
+  session.messages.push({ role: 'user', content: text });
   session.updatedAt = Date.now();
   sessions.set(phone, session);
+
+  // ── Agentic loop ─────────────────────────────────────
+  // Haiku may call tools before giving the final text reply.
+  let response = await callHaiku(session.messages);
+
+  while (response.stop_reason === 'tool_use') {
+    const toolBlock = response.content.find(b => b.type === 'tool_use');
+    const toolResult = await executeTool(toolBlock.name, toolBlock.input, phone);
+
+    session.messages.push({ role: 'assistant', content: response.content });
+    session.messages.push({
+      role: 'user',
+      content: [{
+        type: 'tool_result',
+        tool_use_id: toolBlock.id,
+        content: JSON.stringify(toolResult),
+      }],
+    });
+
+    response = await callHaiku(session.messages);
+  }
+
+  // Extract final text reply
+  const reply = response.content.find(b => b.type === 'text')?.text
+    ?? 'Lo siento, hubo un error. Por favor intenta de nuevo.';
+
+  session.messages.push({ role: 'assistant', content: response.content });
+  sessions.set(phone, session);
+
+  return reply;
+}
+
+// ── Anthropic API call ────────────────────────────────
+function callHaiku(messages) {
+  return anthropic.messages.create({
+    model: 'claude-haiku-4-5',
+    max_tokens: 1024,
+    system: [{ type: 'text', text: SYSTEM, cache_control: { type: 'ephemeral' } }],
+    tools: TOOLS,
+    messages,
+  });
+}
+
+// ── Tool execution ────────────────────────────────────
+async function executeTool(name, input, phone) {
+  if (name === 'get_available_slots') {
+    try {
+      const slots = await getAvailableSlots(8, 60);
+      if (slots.length === 0) {
+        return { available: false, message: 'No hay horarios disponibles en los próximos días.' };
+      }
+      return {
+        available: true,
+        slots: slots.map(s => ({
+          label:     s.label,
+          start_iso: s.start.toISO(),
+          end_iso:   s.end.toISO(),
+        })),
+      };
+    } catch (err) {
+      console.error('[tool] get_available_slots error:', err);
+      return { error: 'No se pudo consultar el calendario en este momento.' };
+    }
+  }
+
+  if (name === 'book_appointment') {
+    try {
+      await bookSlot({
+        startISO:     input.start_iso,
+        endISO:       input.end_iso,
+        patientName:  input.patient_name,
+        patientPhone: phone,
+        type:         input.appointment_type,
+      });
+      return { success: true };
+    } catch (err) {
+      console.error('[tool] book_appointment error:', err);
+      return { error: 'No se pudo registrar la cita. Por favor intenta de nuevo.' };
+    }
+  }
+
+  return { error: `Herramienta desconocida: ${name}` };
 }
