@@ -196,29 +196,40 @@
 flowchart TD
     A([📱 Mensaje entrante]) --> B{¿Es multimedia?\nfoto · video · audio · doc}
 
-    B -->|Sí| ESC1[🚨 Escalación\n"Le haré saber al Dr. León"\nNotifica al grupo del doctor]
+    B -->|Sí| ESC1[🚨 Escalación\n"Le haré saber al Dr. León"\nNotifica al grupo]
     B -->|No — es texto| C{¿Contiene síntomas\no contenido médico?}
+    C -->|Sí| ESC2[🚨 Escalación\n"Le haré saber al Dr. León"\nNotifica al grupo]
+    C -->|No| D{¿Saludo nuevo\no sesión expirada?}
 
-    C -->|Sí| ESC2[🚨 Escalación\n"Le haré saber al Dr. León"\nNotifica al grupo del doctor]
-    C -->|No| D{¿Es saludo nuevo\no sesión expirada?}
-
-    D -->|Sí| MENU[Menú de opciones\n1️⃣ Primera vez\n2️⃣ Seguimiento\n3️⃣ Procedimiento\n4️⃣ Urgencia\n5️⃣ Otro tema]
+    D -->|Sí| MENU[🗂️ Menú principal\n1 Primera vez\n2 Seguimiento\n3 Procedimiento\n4 Urgencia\n5 Otro tema]
     D -->|No| CONT[Continúa el paso actual]
 
     MENU --> T{¿Qué elige?}
     T -->|1 · 2 · 3 · 4| NAME[Solicita nombre completo]
-    T -->|5 — Otro tema| OTHER[¿Sobre qué tema?\nRecoge mensaje]
+    T -->|5 Otro tema| SUB[🗂️ Submenú\n1 Facturas\n2 Ubicación\n3 Servicios\n4 Otro]
     T -->|Inválido| MENU
 
-    OTHER --> ESC3[🚨 Escalación\n"El Dr. León te contactará"\nNotifica al grupo del doctor]
+    SUB --> ST{¿Qué elige?}
+    ST -->|1 Facturas| FAC[Instrucciones de facturación\n+ link al formulario]
+    ST -->|2 Ubicación| UBI[Dirección · edificio · consultorio\nreferencias · link Maps]
+    ST -->|3 Servicios| SVC[Lista de especialidades\ny servicios del Dr. León]
+    ST -->|4 Otro| FREE[Acepta texto libre\nRecoge el tema]
+    ST -->|Inválido| SUB
+
+    FAC --> LOOP{¿Algo más?}
+    UBI --> LOOP
+    SVC --> LOOP
+    FREE --> ESC3[🚨 Escalación\n"El Dr. León te contactará"\nNotifica al grupo]
+
+    LOOP -->|1 Ver otras opciones| SUB
+    LOOP -->|2 Agendar una cita| NAME
 
     NAME --> SLOTS[Consulta Google Calendar\nMuestra hasta 6 horarios]
-    SLOTS --> SL{¿Elige un número?}
-    SL -->|Válido| CONF[Muestra resumen\nPide confirmación sí / no]
+    SLOTS --> SL{¿Elige número?}
+    SL -->|Válido| CONF[Resumen · pide confirmación]
     SL -->|Inválido| SLOTS
-
     CONF --> CV{¿Confirma?}
-    CV -->|Sí ✅| BOOK[Registra en Google Calendar\nEnvía confirmación con Maps]
+    CV -->|Sí ✅| BOOK[Registra en Google Calendar\nEnvía confirmación + Maps]
     CV -->|No| SLOTS
 
     style ESC1 fill:#fff0f0,stroke:#e53e3e
@@ -226,7 +237,9 @@ flowchart TD
     style ESC3 fill:#fff0f0,stroke:#e53e3e
     style BOOK fill:#f0faf4,stroke:#38a169
     style MENU fill:#f7f7f7,stroke:#aaa
-    style OTHER fill:#fffbf0,stroke:#d69e2e
+    style SUB fill:#f7f7f7,stroke:#aaa
+    style FREE fill:#fffbf0,stroke:#d69e2e
+    style LOOP fill:#f0f4ff,stroke:#3182ce
   </div>
 </section>
 
@@ -343,14 +356,34 @@ flowchart TD
     </div>
   </div>
 
-  <!-- 6. Otro tema -->
+  <!-- 6. Otro tema — Facturas -->
   <div class="example-group">
-    <h3>6. Paciente elige "Otro tema"</h3>
-    <p>El paciente no quiere agendar pero necesita comunicarse. La opción 5 abre un canal directo al doctor sin que el bot tenga que responder sobre algo fuera de su alcance.</p>
+    <h3>6a. Otro tema → Facturas</h3>
+    <p>Paciente necesita factura. Bot da instrucciones precisas y ofrece continuar.</p>
     <div class="bubble-row">
-      <div class="bubble patient"><span class="tag">Paciente</span>Hola</div>
-      <div class="bubble good"><span class="tag">✅ Bot</span>Hola 👋 Bienvenido al consultorio del <strong>Dr. Mario León</strong>.<br><br>¿En qué te puedo ayudar?<br><br>1️⃣ Primera vez<br>2️⃣ Seguimiento<br>3️⃣ Procedimiento<br>4️⃣ Urgencia<br>5️⃣ Otro tema</div>
       <div class="bubble patient"><span class="tag">Paciente</span>5</div>
+      <div class="bubble good"><span class="tag">✅ Bot</span>¿Sobre qué necesitas información?<br><br>1️⃣ Facturas<br>2️⃣ Ubicación<br>3️⃣ Servicios<br>4️⃣ Otro</div>
+      <div class="bubble patient"><span class="tag">Paciente</span>1</div>
+      <div class="bubble good"><span class="tag">✅ Bot</span>🧾 <strong>Facturación</strong><br><br>Ingresa al siguiente enlace y completa el formulario con los datos de tu cita y tu RFC:<br>🔗 https://www.drmarioleonretina.com/facturacion<br><br>La factura se envía directamente a tu correo electrónico. Si tienes dudas escríbenos a drmarioleonretina@gmail.com<br><br>─────────────────<br>¿Puedo ayudarte en algo más?<br><br>1️⃣ Ver otras opciones<br>2️⃣ Agendar una cita</div>
+    </div>
+  </div>
+
+  <!-- 6b. Otro tema — Ubicación -->
+  <div class="example-group">
+    <h3>6b. Otro tema → Ubicación</h3>
+    <p>Información completa del consultorio con referencia visual y link de Maps (WhatsApp genera preview automático).</p>
+    <div class="bubble-row">
+      <div class="bubble patient"><span class="tag">Paciente</span>2</div>
+      <div class="bubble good"><span class="tag">✅ Bot</span>📍 <strong>50 Doctors Torres Médicas 8, Consultorio 219</strong><br>Blvd. Lic. Luis Sánchez Pontón 616, Col. Anzures, 72530 Puebla.<br><br>En la esquina de Blvd. Luis Sánchez Pontón y Calle 8 Sur, a dos calles de Plaza Dorada.<br><br>🗺️ https://maps.app.goo.gl/7qBREP9UHuCptPBR6<br><br>─────────────────<br>¿Puedo ayudarte en algo más?<br><br>1️⃣ Ver otras opciones<br>2️⃣ Agendar una cita</div>
+    </div>
+  </div>
+
+  <!-- 6c. Otro tema → Otro (libre) -->
+  <div class="example-group">
+    <h3>6c. Otro tema → Otro (único campo libre)</h3>
+    <p>Solo aquí el paciente puede escribir libremente. El bot confirma y el doctor recibe el resumen en el grupo.</p>
+    <div class="bubble-row">
+      <div class="bubble patient"><span class="tag">Paciente</span>4</div>
       <div class="bubble good"><span class="tag">✅ Bot</span>¿Sobre qué tema necesitas hablar? Escríbemelo brevemente y se lo haré saber al Dr. León.</div>
       <div class="bubble patient"><span class="tag">Paciente</span>Quiero saber si el doctor atiende pacientes con diabetes que tienen problemas en la retina</div>
       <div class="bubble good"><span class="tag">✅ Bot</span>Gracias. Le haré saber al Dr. León para que pueda contactarte directamente. 👨‍⚕️</div>
