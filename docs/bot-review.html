@@ -194,42 +194,42 @@
   <h2>Árbol de decisión</h2>
   <div class="mermaid">
 flowchart TD
-    A([📱 Mensaje entrante]) --> B{¿Es multimedia?\nfoto · video · audio · doc}
+    A([Mensaje entrante]) --> B{Multimedia\nfoto, video, audio, doc}
 
-    B -->|Sí| ESC1[🚨 Escalación\n"Le haré saber al Dr. León"\nNotifica al grupo]
-    B -->|No — es texto| C{¿Contiene síntomas\no contenido médico?}
-    C -->|Sí| ESC2[🚨 Escalación\n"Le haré saber al Dr. León"\nNotifica al grupo]
-    C -->|No| D{¿Saludo nuevo\no sesión expirada?}
+    B -->|Si| ESC1[ESCALACION\nRedirige al paciente\nNotifica al grupo del doctor]
+    B -->|No, es texto| C{Contiene sintomas\no contenido medico}
+    C -->|Si| ESC2[ESCALACION\nRedirige al paciente\nNotifica al grupo del doctor]
+    C -->|No| D{Saludo nuevo o\nsesion expirada}
 
-    D -->|Sí| MENU[🗂️ Menú principal\n1 Primera vez\n2 Seguimiento\n3 Procedimiento\n4 Urgencia\n5 Otro tema]
-    D -->|No| CONT[Continúa el paso actual]
+    D -->|Si| MENU[MENU PRINCIPAL\n1 Primera vez\n2 Seguimiento\n3 Procedimiento\n4 Urgencia\n5 Otro tema]
+    D -->|No| CONT[Continua el paso actual]
 
-    MENU --> T{¿Qué elige?}
-    T -->|1 · 2 · 3 · 4| NAME[Solicita nombre completo]
-    T -->|5 Otro tema| SUB[🗂️ Submenú\n1 Facturas\n2 Ubicación\n3 Servicios\n4 Otro]
-    T -->|Inválido| MENU
+    MENU --> T{Que elige}
+    T -->|1, 2, 3 o 4| NAME[Solicita nombre completo]
+    T -->|5 Otro tema| SUB[SUBMENU\n1 Facturas\n2 Ubicacion\n3 Servicios\n4 Otro]
+    T -->|Invalido| MENU
 
-    SUB --> ST{¿Qué elige?}
-    ST -->|1 Facturas| FAC[Instrucciones de facturación\n+ link al formulario]
-    ST -->|2 Ubicación| UBI[Dirección · edificio · consultorio\nreferencias · link Maps]
-    ST -->|3 Servicios| SVC[Lista de especialidades\ny servicios del Dr. León]
-    ST -->|4 Otro| FREE[Acepta texto libre\nRecoge el tema]
-    ST -->|Inválido| SUB
+    SUB --> ST{Que elige}
+    ST -->|1 Facturas| FAC[Instrucciones de facturacion\nLink al formulario]
+    ST -->|2 Ubicacion| UBI[Direccion, edificio, consultorio\nReferencias y link Maps]
+    ST -->|3 Servicios| SVC[Especialidades y servicios\ndel Dr. Leon]
+    ST -->|4 Otro| FREE[Unica entrada de texto libre\nRecoge el tema del paciente]
+    ST -->|Invalido| SUB
 
-    FAC --> LOOP{¿Algo más?}
+    FAC --> LOOP{Algo mas}
     UBI --> LOOP
     SVC --> LOOP
-    FREE --> ESC3[🚨 Escalación\n"El Dr. León te contactará"\nNotifica al grupo]
+    FREE --> ESC3[ESCALACION\nEl Dr. Leon te contactara\nNotifica al grupo del doctor]
 
     LOOP -->|1 Ver otras opciones| SUB
     LOOP -->|2 Agendar una cita| NAME
 
     NAME --> SLOTS[Consulta Google Calendar\nMuestra hasta 6 horarios]
-    SLOTS --> SL{¿Elige número?}
-    SL -->|Válido| CONF[Resumen · pide confirmación]
-    SL -->|Inválido| SLOTS
-    CONF --> CV{¿Confirma?}
-    CV -->|Sí ✅| BOOK[Registra en Google Calendar\nEnvía confirmación + Maps]
+    SLOTS --> SL{Elige numero}
+    SL -->|Valido| CONF[Resumen de la cita\nPide confirmacion si o no]
+    SL -->|Invalido| SLOTS
+    CONF --> CV{Confirma}
+    CV -->|Si| BOOK[Registra en Google Calendar\nEnvia confirmacion con Maps]
     CV -->|No| SLOTS
 
     style ESC1 fill:#fff0f0,stroke:#e53e3e
