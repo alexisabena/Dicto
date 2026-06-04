@@ -319,44 +319,35 @@ flowchart TD
     </div>
   </div>
 
-  <!-- 3. Location -->
+  <!-- 3. Servicios submenu -->
   <div class="example-group">
-    <h3>3. Paciente no encuentra el consultorio</h3>
-    <p>Se da la información una vez. Si persiste, se ofrece que el doctor lo contacte — pero no se acompaña paso a paso ni se cede ante presión.</p>
+    <h3>3. Paciente consulta los servicios disponibles</h3>
+    <p>El paciente no sabe qué tipo de cita necesita. Opción 5 → Servicios le da el contexto para decidir, luego puede agendar directo.</p>
     <div class="bubble-row">
-      <div class="bubble patient"><span class="tag">Paciente</span>¿Dónde están ubicados?</div>
-      <div class="bubble good"><span class="tag">✅ Bot</span>📍 Blvd. Lic. Luis Sánchez Pontón 616, Col. Anzures, 72530 Puebla.<br>🗺️ https://maps.app.goo.gl/Yqhb6rgZ3E3XRUhf8</div>
-      <div class="bubble patient"><span class="tag">Paciente</span>Pero no lo encuentro, ya estoy cerca y no doy con él</div>
-      <div class="bubble good"><span class="tag">✅ Bot — firme y cálido</span>El link de Maps te lleva directo al consultorio. Si sigues con dificultad, puedo hacer que el Dr. León te contacte para orientarte. ¿Lo hacemos? 🗺️</div>
-      <div class="bubble patient"><span class="tag">Paciente</span>Pues que salga él a buscarme, para eso cobran lo que cobran</div>
-      <div class="bubble good"><span class="tag">✅ Bot — sin ceder, sin debate</span>Entiendo. Esa es toda la información de ubicación disponible. Si deseas, con gusto agendo tu próxima cita cuando te sea más conveniente llegar.</div>
-      <div class="bubble bad"><span class="tag">❌ Bot — evitar</span>¡Claro! ¿En qué calle está ahorita? Permítame preguntarle al doctor si puede salir un momento a indicarle el camino...</div>
+      <div class="bubble patient"><span class="tag">Paciente</span>5</div>
+      <div class="bubble good"><span class="tag">✅ Bot</span>¿Sobre qué necesitas información?<br><br>1️⃣ Facturas<br>2️⃣ Ubicación<br>3️⃣ Servicios<br>4️⃣ Otro</div>
+      <div class="bubble patient"><span class="tag">Paciente</span>3</div>
+      <div class="bubble good"><span class="tag">✅ Bot</span>👁️ <strong>Servicios del Dr. Mario León</strong><br>Oftalmólogo especialista en retina.<br><br>• <strong>Retina</strong> — Desprendimiento, desgarros y retinopatía diabética<br>• <strong>Vítreo</strong> — Hemorragia vítrea y cuerpos flotantes<br>• <strong>Mácula</strong> — Degeneración macular y agujero macular<br>• <strong>Cataratas</strong> — Cirugía con tecnología de microincisión<br>• <strong>Examen oftalmológico completo</strong> — Valoración integral con receta actualizada<br>• <strong>Urgencias</strong> — Pérdida súbita de visión o trauma ocular<br><br>Tecnología: OCT, angiografía, vitrectomía, láser.<br><br>─────────────────<br>¿Puedo ayudarte en algo más?<br><br>1️⃣ Ver otras opciones<br>2️⃣ Agendar una cita</div>
+      <div class="bubble patient"><span class="tag">Paciente</span>2</div>
+      <div class="bubble good"><span class="tag">✅ Bot</span>¿Qué tipo de cita necesitas?<br><br>1️⃣ Primera vez<br>2️⃣ Seguimiento<br>3️⃣ Procedimiento<br>4️⃣ Urgencia</div>
     </div>
   </div>
 
-  <!-- 4. Favoritism -->
+  <!-- 4. Bot reactivation -->
   <div class="example-group">
-    <h3>4. Paciente pide trato especial</h3>
-    <p>El proceso es el mismo para todos. Se responde con calidez, sin disculpas excesivas.</p>
+    <h3>4. El doctor atendió al paciente — cómo vuelve el bot</h3>
+    <p>Cuando hay una escalación el bot entra en modo silencioso. El paciente puede reactivarlo en cualquier momento escribiendo "hola".</p>
     <div class="bubble-row">
-      <div class="bubble patient"><span class="tag">Paciente</span>Soy cuñado del doctor, ¿me puede dar una cita hoy a la hora que sea?</div>
-      <div class="bubble good"><span class="tag">✅ Bot</span>Con mucho gusto te ayudo. El proceso de agendamiento es el mismo para todos — veamos qué horarios tenemos disponibles. ¿Qué tipo de cita necesitas?</div>
-      <div class="bubble bad"><span class="tag">❌ Bot — evitar</span>¡Oh, claro que sí! Déjeme ver qué puedo hacer para usted, en un momento lo comunico con el doctor para que le indique...</div>
+      <div class="bubble patient"><span class="tag">Paciente</span>Hola, me cayó algo en el ojo y me duele mucho</div>
+      <div class="bubble good"><span class="tag">✅ Bot — escalación</span>Gracias por escribirnos. Para este tipo de consulta lo mejor es hablar directamente con el Dr. León — le haré saber para que pueda contactarte. 🩺<br><br>Si mientras tanto quieres agendar una cita, escribe <strong>hola</strong> para volver al asistente.</div>
+      <div class="bubble patient"><span class="tag">Paciente — más tarde</span>Gracias, ya me contactó el doctor</div>
+      <div class="bubble good"><span class="tag">✅ Bot — modo silencioso</span>El Dr. León está atendiendo tu consulta. Cuando quieras volver al asistente, escribe <strong>hola</strong>. 👋</div>
+      <div class="bubble patient"><span class="tag">Paciente — al día siguiente</span>Hola, quiero agendar una cita de seguimiento</div>
+      <div class="bubble good"><span class="tag">✅ Bot — reactivado</span>Hola 👋 Bienvenido al consultorio del <strong>Dr. Mario León</strong>.<br><br>¿En qué te puedo ayudar?<br><br>1️⃣ Primera vez<br>2️⃣ Seguimiento<br>3️⃣ Procedimiento<br>4️⃣ Urgencia<br>5️⃣ Otro tema</div>
     </div>
   </div>
 
-  <!-- 5. Rude patient -->
-  <div class="example-group">
-    <h3>5. Paciente molesto o agresivo</h3>
-    <p>Se reconoce la emoción. No se cede, no se debate, no se imita el tono.</p>
-    <div class="bubble-row">
-      <div class="bubble patient"><span class="tag">Paciente</span>Llevan dos semanas sin atenderme bien, exijo que me den cita hoy y sin cobro</div>
-      <div class="bubble good"><span class="tag">✅ Bot</span>Entiendo tu frustración y lo siento. Lo que puedo hacer desde aquí es ayudarte a agendar la próxima cita disponible. Si quieres que el doctor te contacte directamente, puedes indicármelo.<br><br>¿Continuamos con el agendamiento?</div>
-      <div class="bubble bad"><span class="tag">❌ Bot — evitar</span>Tiene usted toda la razón, disculpe mucho las molestias. Voy a ver cómo le hacemos para que no pague hoy...</div>
-    </div>
-  </div>
-
-  <!-- 6. Otro tema — Facturas -->
+  <!-- 5. Otro tema — Facturas -->
   <div class="example-group">
     <h3>6a. Otro tema → Facturas</h3>
     <p>Paciente necesita factura. Bot da instrucciones precisas y ofrece continuar.</p>
@@ -391,15 +382,6 @@ flowchart TD
     <p style="margin-top:10px; font-size:13px; color:#666;">→ El doctor recibe en el grupo: <em>"Paciente seleccionó 'Otro tema' — Quiero saber si el doctor atiende pacientes con diabetes que tienen problemas en la retina"</em></p>
   </div>
 
-  <!-- 7. Invoicing -->
-  <div class="example-group">
-    <h3>6. Paciente pide factura</h3>
-    <p>Siempre al canal oficial — va directo al contador del doctor.</p>
-    <div class="bubble-row">
-      <div class="bubble patient"><span class="tag">Paciente</span>¿Cómo puedo pedir mi factura?</div>
-      <div class="bubble good"><span class="tag">✅ Bot</span>Las facturas se gestionan desde aquí: 🧾 https://www.drmarioleonretina.com/facturacion<br><br>¿Hay algo más en lo que pueda ayudarte?</div>
-    </div>
-  </div>
 
 </section>
 

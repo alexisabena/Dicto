@@ -121,11 +121,17 @@ export async function handleMessage(phone, text) {
   const msg = text.trim();
 
   if (MEDICAL_PATTERN.test(msg)) {
+    // Mark session as escalated so bot stays quiet until patient restarts
+    const s = sessions.get(phone) ?? { messages: [], updatedAt: Date.now() };
+    s.escalated  = true;
+    s.updatedAt  = Date.now();
+    sessions.set(phone, s);
+
     return {
       reply: [
         `Gracias por escribirnos. Para este tipo de consulta lo mejor es hablar directamente con el Dr. León — le haré saber para que pueda contactarte. 🩺`,
         ``,
-        `Si mientras tanto quieres agendar una cita, aquí te ayudo.`,
+        `Si mientras tanto quieres agendar una cita, escribe *hola* para volver al asistente.`,
       ].join('\n'),
       escalation: { abstract: buildEscalationAbstract(phone, msg, 'Síntoma o consulta médica') },
     };
@@ -139,6 +145,17 @@ async function runStateMachine(phone, msg) {
   let session = sessions.get(phone);
 
   if (session && Date.now() - session.updatedAt > SESSION_TIMEOUT_MS) session = null;
+
+  // If session was escalated to the doctor, stay quiet until patient restarts with a greeting
+  if (session?.escalated) {
+    if (!isGreeting(msg)) {
+      return {
+        reply: `El Dr. León está atendiendo tu consulta. Cuando quieras volver al asistente, escribe *hola*. 👋`,
+      };
+    }
+    // Greeting resets the escalated state and restarts the bot
+    session = null;
+  }
 
   if (!session || isGreeting(msg)) {
     sessions.set(phone, { step: 'ask_type', data: {}, updatedAt: Date.now() });
@@ -235,10 +252,13 @@ function handleAskAfterInfo(phone, session, msg) {
 function handleAskOtherTopic(phone, session, msg) {
   if (msg.length < 3) return `¿Puedes describirme brevemente el tema?`;
 
-  sessions.delete(phone);
+  // Mark as escalated — bot stays quiet until patient sends "hola"
+  session.escalated = true;
+  session.step      = 'escalated';
+  sessions.set(phone, session);
 
   return {
-    reply: `Gracias. Le haré saber al Dr. León para que pueda contactarte directamente. 👨‍⚕️`,
+    reply: `Gracias. Le haré saber al Dr. León para que pueda contactarte directamente. 👨‍⚕️\n\nCuando quieras volver al asistente, escribe *hola*.`,
     escalation: {
       abstract: buildEscalationAbstract(phone, msg, 'Paciente seleccionó "Otro tema"'),
     },
